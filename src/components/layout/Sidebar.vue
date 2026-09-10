@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-full shrink-0 flex">
     <!-- Mobile Backdrop Overlay -->
     <transition
       enter-active-class="transition-opacity duration-300 ease-out"
@@ -19,7 +19,7 @@
     <!-- Sidebar Container -->
     <aside
       :class="[
-        'fixed inset-y-0 left-0 z-50 flex flex-col bg-[#0b1426] border-r border-[#15233e] shadow-[4px_0_24px_rgba(0,0,0,0.3)] transition-all duration-300 ease-in-out md:static select-none text-slate-200',
+        'fixed inset-y-0 left-0 z-50 flex flex-col h-full max-h-screen bg-[#0b1426] border-r border-[#15233e] shadow-[4px_0_24px_rgba(0,0,0,0.3)] transition-all duration-300 ease-in-out md:static select-none text-slate-200 shrink-0',
         // Mobile Drawer behavior
         isMobileOpen ? 'translate-x-0 w-64' : '-translate-x-full md:translate-x-0',
         // Desktop Collapse behavior
@@ -153,33 +153,81 @@
               />
             </button>
 
-            <!-- Submenu Accordion Items -->
+            <!-- Submenu Accordion Items (Level 2 & Level 3) -->
             <div
               v-show="!isCollapsed && isSubmenuOpen(menu)"
-              class="pl-7 pr-1 py-0.5 space-y-0.5 border-l border-[#1a2d52] ml-5"
+              class="pl-4 pr-1 py-0.5 space-y-0.5 border-l border-[#1a2d52] ml-5"
             >
-              <router-link
-                v-for="sub in menu.children"
-                :key="sub.id"
-                :to="sub.path || '#'"
-                @click="handleNavClick"
-                :class="[
-                  'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
-                  isRouteActive(sub.path)
-                    ? 'bg-[#1b2f56] text-white font-semibold'
-                    : 'text-[#94a3b8] hover:bg-[#142340] hover:text-white'
-                ]"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" :class="isRouteActive(sub.path) ? 'bg-cyan-400' : ''"></span>
-                <span class="truncate">{{ sub.name }}</span>
-              </router-link>
+              <template v-for="sub in menu.children" :key="sub.id">
+                <!-- Level 2 without children -->
+                <router-link
+                  v-if="!sub.children || sub.children.length === 0"
+                  :to="sub.path || '#'"
+                  @click="handleNavClick"
+                  :class="[
+                    'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+                    isRouteActive(sub.path)
+                      ? 'bg-[#1b2f56] text-white font-semibold'
+                      : 'text-[#94a3b8] hover:bg-[#142340] hover:text-white'
+                  ]"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" :class="isRouteActive(sub.path) ? 'bg-cyan-400' : ''"></span>
+                  <span class="truncate">{{ sub.name }}</span>
+                </router-link>
+
+                <!-- Level 2 WITH children (e.g. Jadwal Pelayanan -> Sermon, Minggu, Lainnya) -->
+                <div v-else class="space-y-0.5">
+                  <button
+                    @click="toggleSubmenu(sub.id)"
+                    :class="[
+                      'w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer',
+                      isParentActive(sub)
+                        ? 'bg-[#182b4e] text-white font-semibold'
+                        : 'text-[#94a3b8] hover:bg-[#142340] hover:text-white'
+                    ]"
+                  >
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-500/60 shrink-0"></span>
+                      <span class="truncate">{{ sub.name }}</span>
+                    </div>
+                    <ChevronRight
+                      :class="[
+                        'w-3 h-3 text-[#7e95b7] transition-transform duration-200 shrink-0',
+                        isSubmenuOpen(sub) ? 'rotate-90 text-white' : ''
+                      ]"
+                    />
+                  </button>
+
+                  <!-- Level 3 Children (Sermon, Minggu, Lainnya) -->
+                  <div
+                    v-show="isSubmenuOpen(sub)"
+                    class="pl-4 pr-1 py-0.5 space-y-0.5 border-l border-[#1f3764] ml-3"
+                  >
+                    <router-link
+                      v-for="sub3 in sub.children"
+                      :key="sub3.id"
+                      :to="sub3.path || '#'"
+                      @click="handleNavClick"
+                      :class="[
+                        'flex items-center gap-2 px-2 py-1 rounded-md text-[11px] font-medium transition-colors',
+                        isRouteActive(sub3.path)
+                          ? 'bg-[#223d6f] text-cyan-300 font-semibold'
+                          : 'text-[#829bbd] hover:bg-[#152747] hover:text-white'
+                      ]"
+                    >
+                      <span class="w-1 h-1 rounded-full bg-slate-500 shrink-0" :class="isRouteActive(sub3.path) ? 'bg-cyan-400' : ''"></span>
+                      <span class="truncate">{{ sub3.name }}</span>
+                    </router-link>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 4. Bottom Section: Fixed User Profile & Logout Button -->
-      <div class="p-3 border-t border-[#15233e] bg-[#0b1426] shrink-0 space-y-2">
+      <!-- 4. Bottom Section: FIXED User Profile & Logout Button -->
+      <div class="mt-auto p-3 border-t border-[#15233e] bg-[#0b1426] shrink-0 space-y-2">
         <!-- User Profile Row -->
         <div
           :class="[
@@ -428,8 +476,14 @@ const isRouteActive = (path) => {
 }
 
 const isParentActive = (menu) => {
-  if (!menu.children) return false
-  return menu.children.some(child => child.path && route.path.startsWith(child.path))
+  if (!menu.children || menu.children.length === 0) return false
+  return menu.children.some(child => {
+    if (child.path && route.path.startsWith(child.path)) return true
+    if (child.children && child.children.length > 0) {
+      return isParentActive(child)
+    }
+    return false
+  })
 }
 
 const getUserInitials = () => {
