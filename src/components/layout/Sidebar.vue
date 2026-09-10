@@ -167,73 +167,66 @@
         </div>
       </div>
 
-      <!-- 4. Bottom User Profile Bar with Floating Popover -->
-      <div class="relative p-2.5 border-t border-[#15233e] bg-[#0b1426] shrink-0">
-        <!-- Floating Popover Card -->
-        <transition
-          enter-active-class="transition duration-150 ease-out"
-          enter-from-class="opacity-0 translate-y-2 scale-95"
-          enter-to-class="opacity-100 translate-y-0 scale-100"
-          leave-active-class="transition duration-100 ease-in"
-          leave-from-class="opacity-100 translate-y-0 scale-100"
-          leave-to-class="opacity-0 translate-y-2 scale-95"
-        >
-          <div
-            v-if="isProfilePopoverOpen"
-            class="absolute bottom-[68px] left-2.5 right-2.5 bg-[#111e38] border border-[#1e345e] rounded-xl shadow-2xl p-1.5 space-y-1 z-50"
-          >
-            <button
-              @click="openChangeRoleModal"
-              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-[#182b4e] hover:text-white transition-colors text-left"
-            >
-              <UserCheck class="w-4 h-4 text-cyan-400 shrink-0" />
-              <span>Change Akses Repo</span>
-            </button>
-
-            <button
-              @click="handleLogout"
-              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-red-300 hover:bg-red-500/10 hover:text-red-400 transition-colors text-left"
-            >
-              <LogOut class="w-4 h-4 text-red-400 shrink-0" />
-              <span>Logout</span>
-            </button>
-          </div>
-        </transition>
-
-        <!-- Profile Bar Button -->
-        <button
-          @click="isProfilePopoverOpen = !isProfilePopoverOpen"
+      <!-- 4. Bottom Section: Fixed User Profile & Logout Button -->
+      <div class="p-3 border-t border-[#15233e] bg-[#0b1426] shrink-0 space-y-2">
+        <!-- User Profile Row -->
+        <div
           :class="[
-            'w-full flex items-center justify-between p-1.5 rounded-xl transition-all',
-            isProfilePopoverOpen ? 'bg-[#152442]' : 'hover:bg-[#101b33]',
-            isCollapsed ? 'justify-center p-1' : ''
+            'flex items-center gap-2.5 p-1.5 rounded-xl bg-[#101c34]/60 border border-[#162544]',
+            isCollapsed ? 'justify-center p-1 border-0 bg-transparent' : ''
           ]"
         >
-          <div class="flex items-center gap-2.5 min-w-0">
-            <!-- User Avatar Circle in Cyan (#06b6d4) -->
-            <div class="w-8 h-8 rounded-full bg-[#06b6d4] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
-              {{ getUserInitials() }}
-            </div>
-            <!-- Name & Role (Hidden when collapsed) -->
-            <div v-show="!isCollapsed" class="text-left min-w-0">
-              <p class="text-[12.5px] font-bold text-white truncate leading-tight">
-                {{ authStore.user?.name || 'Admin Pusat' }}
-              </p>
-              <p class="text-[10.5px] text-[#7e95b7] truncate leading-tight mt-0.5">
-                {{ authStore.userRoles[0]?.code?.toLowerCase() || 'admin-pusat' }}
-              </p>
-            </div>
+          <!-- User Avatar Circle in Cyan (#06b6d4) -->
+          <div
+            class="w-8 h-8 rounded-full bg-[#06b6d4] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm"
+            :title="authStore.user?.name"
+          >
+            {{ getUserInitials() }}
           </div>
 
-          <!-- Caret Icon -->
-          <ChevronUp
+          <!-- Name & Role (Hidden when collapsed) -->
+          <div v-show="!isCollapsed" class="text-left min-w-0 flex-1">
+            <p class="text-[12px] font-bold text-white truncate leading-tight">
+              {{ authStore.user?.name || 'Admin Pusat' }}
+            </p>
+            <p class="text-[10px] text-[#7e95b7] truncate leading-tight mt-0.5">
+              {{ authStore.userRoles[0]?.code?.toLowerCase() || 'admin-pusat' }}
+            </p>
+          </div>
+
+          <!-- Quick Role / Access Modal Trigger (Hidden when collapsed) -->
+          <button
             v-show="!isCollapsed"
-            :class="[
-              'w-3.5 h-3.5 text-[#7e95b7] transition-transform duration-200 shrink-0',
-              isProfilePopoverOpen ? 'rotate-180 text-white' : ''
-            ]"
-          />
-        </button>
+            @click="openChangeRoleModal"
+            class="text-[#7e95b7] hover:text-cyan-400 p-1.5 rounded-lg hover:bg-[#15233e] transition-colors shrink-0"
+            title="Lihat Peran & Akses Aktif"
+          >
+            <UserCheck class="w-4 h-4" />
+          </button>
+        </div>
+
+        <!-- FIXED Logout Button At The Bottom -->
+        <div>
+          <!-- Expanded Mode: Full Width Button with Text -->
+          <button
+            v-if="!isCollapsed"
+            @click="handleLogout"
+            class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 hover:border-rose-500/40 transition-all group shadow-xs cursor-pointer"
+          >
+            <LogOut class="w-4 h-4 text-rose-400 group-hover:-translate-x-0.5 transition-transform shrink-0" />
+            <span>Keluar Sistem</span>
+          </button>
+
+          <!-- Collapsed Mode: Icon-Only Centered Button -->
+          <button
+            v-else
+            @click="handleLogout"
+            title="Keluar Sistem"
+            class="w-10 h-10 mx-auto flex items-center justify-center rounded-xl text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all cursor-pointer"
+          >
+            <LogOut class="w-4 h-4 text-rose-400" />
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -333,7 +326,6 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 // State
-const isProfilePopoverOpen = ref(false)
 const isChangeRoleModalOpen = ref(false)
 const searchQuery = ref('')
 const searchInputRef = ref(null)
@@ -524,12 +516,10 @@ const handleNavClick = () => {
 }
 
 const openChangeRoleModal = () => {
-  isProfilePopoverOpen.value = false
   isChangeRoleModalOpen.value = true
 }
 
 const handleLogout = () => {
-  isProfilePopoverOpen.value = false
   authStore.logout()
   router.push('/login')
 }
@@ -544,21 +534,12 @@ const handleKeyDown = (e) => {
   }
 }
 
-const handleClickOutside = (e) => {
-  const target = e.target
-  if (!target.closest('aside')) {
-    isProfilePopoverOpen.value = false
-  }
-}
-
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
-  document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
-  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 

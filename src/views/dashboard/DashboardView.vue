@@ -1,34 +1,34 @@
 <template>
   <div class="space-y-6">
-    <!-- Welcome Header Banner (Dark Enterprise Navy) -->
-    <div class="relative overflow-hidden rounded-2xl bg-[#0b1426] border border-[#15233e] p-6 sm:p-8 shadow-2xl">
-      <!-- Ambient Glow -->
-      <div class="absolute -top-24 -right-24 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- Welcome Header Banner (White Enterprise Card) -->
+    <div class="relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+      <!-- Subtle top decorative gradient line -->
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600"></div>
 
       <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold mb-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-700 text-xs font-semibold mb-3">
             ✨ Church Enterprise System v1.0
           </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Selamat Datang, {{ authStore.user?.name || 'Administrator' }}!
           </h1>
-          <p class="text-[#7e95b7] text-sm mt-1.5 max-w-xl leading-relaxed">
-            Sistem informasi terintegrasi untuk pengelolaan jadwal ibadah, absensi, keuangan kas, dan hak akses gereja.
+          <p class="text-slate-500 text-sm mt-1.5 max-w-xl leading-relaxed">
+            Sistem informasi terintegrasi untuk pengelolaan jadwal ibadah, absensi jemaat, keuangan kas gereja, dan manajemen hak akses (RBAC).
           </p>
         </div>
 
         <div class="flex items-center gap-3 shrink-0">
           <router-link
             to="/users"
-            class="px-4 py-2.5 rounded-xl bg-[#162a52] hover:bg-[#1c3668] border border-[#23427f] text-white font-semibold text-xs transition-all shadow-md flex items-center gap-2"
+            class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-2"
           >
             <span>👥</span>
             <span>Kelola User</span>
           </router-link>
           <router-link
             to="/roles"
-            class="px-4 py-2.5 rounded-xl bg-[#101c34] hover:bg-[#152442] text-slate-200 border border-[#1c2e50] font-semibold text-xs transition-all flex items-center gap-2"
+            class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold text-xs transition-all flex items-center gap-2"
           >
             <span>🛡️</span>
             <span>Hak Akses</span>
@@ -37,107 +37,178 @@
       </div>
     </div>
 
-    <!-- Quick Stats Grid -->
+    <!-- Quick Stats Grid (White Cards) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
       <!-- Total Users -->
-      <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-5 shadow-xl hover:border-[#1e345e] transition-all">
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-slate-300 transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#7e95b7]">Total Pengguna</p>
-            <p class="text-2xl font-extrabold text-white mt-1">{{ stats.users }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Pengguna</p>
+            <p class="text-2xl font-extrabold text-slate-900 mt-1">{{ stats.users }}</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-lg font-bold">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center text-lg font-bold">
             👤
           </div>
         </div>
-        <div class="mt-3 flex items-center text-xs text-[#7e95b7]">
-          <span class="text-cyan-400 font-semibold">Aktif</span> &nbsp;di sistem gereja
+        <div class="mt-3 flex items-center text-xs text-slate-500">
+          <span class="text-emerald-600 font-semibold">Aktif</span> &nbsp;di sistem gereja
         </div>
       </div>
 
       <!-- Total Roles -->
-      <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-5 shadow-xl hover:border-[#1e345e] transition-all">
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-slate-300 transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#7e95b7]">Peran Sistem</p>
-            <p class="text-2xl font-extrabold text-white mt-1">{{ stats.roles }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Peran Sistem</p>
+            <p class="text-2xl font-extrabold text-slate-900 mt-1">{{ stats.roles }}</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg font-bold">
+          <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-100 text-cyan-600 flex items-center justify-center text-lg font-bold">
             🛡️
           </div>
         </div>
-        <div class="mt-3 flex items-center text-xs text-[#7e95b7]">
+        <div class="mt-3 flex items-center text-xs text-slate-500">
           Hak akses RBAC terproteksi
         </div>
       </div>
 
       <!-- Total Menus -->
-      <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-5 shadow-xl hover:border-[#1e345e] transition-all">
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-slate-300 transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#7e95b7]">Menu Terdaftar</p>
-            <p class="text-2xl font-extrabold text-white mt-1">{{ stats.menus }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Menu Terdaftar</p>
+            <p class="text-2xl font-extrabold text-slate-900 mt-1">{{ stats.menus }}</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center text-lg font-bold">
-            📑
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-bold">
+            📂
           </div>
         </div>
-        <div class="mt-3 flex items-center text-xs text-[#7e95b7]">
-          Navigasi dinamis
+        <div class="mt-3 flex items-center text-xs text-slate-500">
+          Navigasi terintegrasi
         </div>
       </div>
 
       <!-- Database Status -->
-      <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-5 shadow-xl hover:border-[#1e345e] transition-all">
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-slate-300 transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#7e95b7]">Status Database</p>
-            <p class="text-2xl font-extrabold text-emerald-400 mt-1">Online</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">TiDB Cloud</p>
+            <p class="text-2xl font-extrabold text-emerald-600 mt-1">Online</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg font-bold">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-bold">
             ⚡
           </div>
         </div>
-        <div class="mt-3 flex items-center text-xs text-emerald-400">
-          TiDB Cloud MySQL
+        <div class="mt-3 flex items-center text-xs text-slate-500">
+          Latency: <span class="font-medium text-slate-700 ml-1">~120ms</span>
         </div>
       </div>
     </div>
 
-    <!-- Modul Roadmap Cards -->
-    <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-6 shadow-xl">
-      <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4">
-        Rangkaian Modul ERP Gereja
-      </h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Module 1 -->
-        <div class="p-4 rounded-xl bg-[#101c34] border border-[#1c2e50]">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-lg">🔐</span>
-            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold">Aktif</span>
+    <!-- Informasi Modul Gereja & Log Aktivitas (White Cards) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Modul Status -->
+      <div class="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Kesiapan Modul ERP</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Status modul fungsional sistem gereja</p>
           </div>
-          <h4 class="font-bold text-white text-sm">Modul 1: Otentikasi & RBAC</h4>
-          <p class="text-xs text-[#7e95b7] mt-1">Users, Roles, Dynamic Menus, dan Audit Trail.</p>
+          <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
+            Sprint 1
+          </span>
         </div>
 
-        <!-- Module 2 -->
-        <div class="p-4 rounded-xl bg-[#101c34]/50 border border-[#172644]">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-lg">📅</span>
-            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">Berikutnya</span>
+        <div class="space-y-3">
+          <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-lg">🔐</span>
+              <div>
+                <p class="text-xs font-bold text-slate-800">Autentikasi & RBAC (Users, Roles, Menus)</p>
+                <p class="text-[11px] text-slate-500">Manajemen akses multi-role dan menu dinamis</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-semibold">
+              Aktif
+            </span>
           </div>
-          <h4 class="font-bold text-slate-200 text-sm">Modul 2: Jadwal & Absensi</h4>
-          <p class="text-xs text-[#7e95b7] mt-1">Jadwal ibadah, penugasan pelayan, dan absensi kehadiran.</p>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-lg">📅</span>
+              <div>
+                <p class="text-xs font-bold text-slate-800">Manajemen Ibadah & Event Gereja</p>
+                <p class="text-[11px] text-slate-500">Penjadwalan ibadah raya, komisi, dan penugasan pelayan</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-semibold">
+              Database Ready
+            </span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-lg">💰</span>
+              <div>
+                <p class="text-xs font-bold text-slate-800">Keuangan & Kas Persembahan</p>
+                <p class="text-[11px] text-slate-500">Pencatatan persembahan, kas masuk/keluar, dan laporan</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-semibold">
+              Database Ready
+            </span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-lg">📋</span>
+              <div>
+                <p class="text-xs font-bold text-slate-800">Absensi Jemaat & Pelayan</p>
+                <p class="text-[11px] text-slate-500">Pencatatan kehadiran ibadah dan pelayan altar</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-semibold">
+              Database Ready
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Info Card -->
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] space-y-4">
+        <div class="border-b border-slate-100 pb-4">
+          <h2 class="text-base font-bold text-slate-900">Informasi Sesi</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Detail akun yang sedang aktif</p>
         </div>
 
-        <!-- Module 3 -->
-        <div class="p-4 rounded-xl bg-[#101c34]/50 border border-[#172644]">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-lg">💰</span>
-            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Rencana</span>
+        <div class="space-y-3 text-xs">
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Nama Pengguna</span>
+            <span class="font-bold text-slate-800">{{ authStore.user?.name || '-' }}</span>
           </div>
-          <h4 class="font-bold text-slate-200 text-sm">Modul 3: Keuangan Kas</h4>
-          <p class="text-xs text-[#7e95b7] mt-1">Kas masuk (kolekte/donasi), kas keluar, dan mutasi.</p>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Email</span>
+            <span class="font-semibold text-slate-800">{{ authStore.user?.email || '-' }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Role Terpilih</span>
+            <span class="px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 font-semibold text-[11px]">
+              {{ authStore.userRoles[0]?.name || 'Admin Pusat' }}
+            </span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Server Backend</span>
+            <span class="text-emerald-600 font-semibold">Port 3000 (Active)</span>
+          </div>
+        </div>
+
+        <div class="pt-3">
+          <router-link
+            to="/users"
+            class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+          >
+            <span>Buka Manajemen User</span>
+            <span>→</span>
+          </router-link>
         </div>
       </div>
     </div>
@@ -147,7 +218,7 @@
 <script setup>
 import { reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import apiClient from '@/api/axios'
+import api from '@/api/axios'
 
 const authStore = useAuthStore()
 
@@ -157,22 +228,29 @@ const stats = reactive({
   menus: 0
 })
 
-const fetchStats = async () => {
+const fetchDashboardStats = async () => {
   try {
-    const [uRes, rRes, mRes] = await Promise.all([
-      apiClient.get('/users'),
-      apiClient.get('/roles'),
-      apiClient.get('/menus')
+    const [usersRes, rolesRes, menusRes] = await Promise.allSettled([
+      api.get('/users'),
+      api.get('/roles'),
+      api.get('/menus')
     ])
-    if (uRes.success) stats.users = uRes.data?.length || 0
-    if (rRes.success) stats.roles = rRes.data?.length || 0
-    if (mRes.success) stats.menus = mRes.data?.length || 0
-  } catch (error) {
-    console.error('Error fetching dashboard stats:', error)
+
+    if (usersRes.status === 'fulfilled' && usersRes.value.data.success) {
+      stats.users = usersRes.value.data.data.length
+    }
+    if (rolesRes.status === 'fulfilled' && rolesRes.value.data.success) {
+      stats.roles = rolesRes.value.data.data.length
+    }
+    if (menusRes.status === 'fulfilled' && menusRes.value.data.success) {
+      stats.menus = menusRes.value.data.data.length
+    }
+  } catch (err) {
+    console.warn('Gagal memuat sebagian stats dashboard:', err)
   }
 }
 
 onMounted(() => {
-  fetchStats()
+  fetchDashboardStats()
 })
 </script>
