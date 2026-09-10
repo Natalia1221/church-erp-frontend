@@ -77,14 +77,25 @@
         </div>
       </div>
 
-      <!-- 3. Navigation Menu List -->
+      <!-- 3. Navigation Menu List (Dari data m_menus di Database) -->
       <div class="flex-1 overflow-y-auto px-2.5 py-3 space-y-0.5 custom-scroll">
+        <!-- Loading State -->
+        <div v-if="authStore.loadingMenus && combinedNavList.length === 0" class="py-8 text-center text-xs text-[#7e95b7]">
+          <span class="inline-block w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mb-2"></span>
+          <p v-show="!isCollapsed">Memuat menu...</p>
+        </div>
+
+        <!-- Empty State: Jika m_menus belum memiliki menu -->
+        <div v-else-if="combinedNavList.length === 0" class="py-8 px-3 text-center text-xs text-[#7e95b7]">
+          <p v-show="!isCollapsed">Belum ada menu di m_menus.</p>
+        </div>
+
         <!-- If searching and no match found -->
-        <div v-if="searchQuery && filteredNavList.length === 0" class="px-3 py-6 text-center text-xs text-[#7e95b7]">
+        <div v-else-if="searchQuery && filteredNavList.length === 0" class="px-3 py-6 text-center text-xs text-[#7e95b7]">
           Menu "{{ searchQuery }}" tidak ditemukan
         </div>
 
-        <!-- Loop Menus -->
+        <!-- Loop Menus dari m_menus -->
         <div v-for="menu in filteredNavList" :key="menu.id" class="space-y-0.5">
           <!-- Single Menu Item without children -->
           <router-link
@@ -137,14 +148,14 @@
                 v-show="!isCollapsed"
                 :class="[
                   'w-3.5 h-3.5 text-[#7e95b7] transition-transform duration-200 shrink-0',
-                  openSubmenus[menu.id] || searchQuery ? 'rotate-90 text-white' : ''
+                  isSubmenuOpen(menu) ? 'rotate-90 text-white' : ''
                 ]"
               />
             </button>
 
             <!-- Submenu Accordion Items -->
             <div
-              v-show="!isCollapsed && (openSubmenus[menu.id] || searchQuery)"
+              v-show="!isCollapsed && isSubmenuOpen(menu)"
               class="pl-7 pr-1 py-0.5 space-y-0.5 border-l border-[#1a2d52] ml-5"
             >
               <router-link
@@ -330,99 +341,21 @@ const isChangeRoleModalOpen = ref(false)
 const searchQuery = ref('')
 const searchInputRef = ref(null)
 
-const openSubmenus = reactive({
-  setup: true,
-  purchasing: false,
-  inventory: false,
-  marketing: false,
-  ecommerce: false,
-  service: false,
-  accounting: false
-})
+const openSubmenus = reactive({})
 
-// Menu Fallback Template matching the user's reference photo
-const defaultSystemMenus = [
-  {
-    id: 'dashboard',
-    name: 'Dashboard',
-    path: '/dashboard',
-    icon: 'LayoutDashboard'
-  },
-  {
-    id: 'approval',
-    name: 'Approval',
-    path: '/dashboard',
-    icon: 'FileCheck'
-  },
-  {
-    id: 'setup',
-    name: 'Setup',
-    icon: 'Settings',
-    children: [
-      { id: 'users', name: 'Manajemen Pengguna', path: '/users' },
-      { id: 'roles', name: 'Peran & Izin (RBAC)', path: '/roles' },
-      { id: 'menus', name: 'Daftar Menu Sistem', path: '/menus' }
-    ]
-  },
-  {
-    id: 'purchasing',
-    name: 'Purchasing',
-    icon: 'ShoppingCart',
-    children: [
-      { id: 'pur-1', name: 'Permintaan Barang', path: '/dashboard' },
-      { id: 'pur-2', name: 'Order Pembelian', path: '/dashboard' }
-    ]
-  },
-  {
-    id: 'inventory',
-    name: 'Inventory',
-    icon: 'Boxes',
-    children: [
-      { id: 'inv-1', name: 'Stok Barang', path: '/dashboard' },
-      { id: 'inv-2', name: 'Mutasi Gudang', path: '/dashboard' }
-    ]
-  },
-  {
-    id: 'marketing',
-    name: 'Marketing',
-    icon: 'Megaphone',
-    children: [
-      { id: 'mkt-1', name: 'Program Kegiatan', path: '/dashboard' }
-    ]
-  },
-  {
-    id: 'ecommerce',
-    name: 'E-Commerce',
-    icon: 'ShoppingBag',
-    children: [
-      { id: 'ec-1', name: 'Toko Buku & Donasi', path: '/dashboard' }
-    ]
-  },
-  {
-    id: 'service',
-    name: 'Service',
-    icon: 'Wrench',
-    children: [
-      { id: 'srv-1', name: 'Pemeliharaan Gedung', path: '/dashboard' }
-    ]
-  },
-  {
-    id: 'accounting',
-    name: 'Accounting',
-    icon: 'Calculator',
-    children: [
-      { id: 'acc-1', name: 'Kas Masuk & Keluar', path: '/dashboard' },
-      { id: 'acc-2', name: 'Laporan Keuangan', path: '/dashboard' }
-    ]
-  }
-]
+const toggleSubmenu = (menuId) => {
+  openSubmenus[menuId] = !isSubmenuOpen({ id: menuId })
+}
 
-// Dynamic or Default Nav List
+const isSubmenuOpen = (menu) => {
+  if (searchQuery.value) return true
+  if (openSubmenus[menu.id] !== undefined) return openSubmenus[menu.id]
+  return isParentActive(menu) || true
+}
+
+// Nav list riil yang diambil langsung dari database (tabel m_menus)
 const combinedNavList = computed(() => {
-  if (authStore.myMenus && authStore.myMenus.length > 0) {
-    return authStore.myMenus
-  }
-  return defaultSystemMenus
+  return authStore.myMenus || []
 })
 
 // Filter menu based on search query
@@ -466,12 +399,13 @@ const getMenuIcon = (iconName, title = '') => {
     Users,
     ShieldCheck,
     Calendar,
-    DollarSign
+    DollarSign,
+    Layers
   }
 
   if (map[iconName]) return map[iconName]
 
-  const lower = title.toLowerCase()
+  const lower = (title || '').toLowerCase()
   if (lower.includes('dashboard')) return LayoutDashboard
   if (lower.includes('approval') || lower.includes('setuju')) return FileCheck
   if (lower.includes('setup') || lower.includes('pengaturan')) return Settings
@@ -483,13 +417,9 @@ const getMenuIcon = (iconName, title = '') => {
   if (lower.includes('account') || lower.includes('kas') || lower.includes('keuangan')) return Calculator
   if (lower.includes('user') || lower.includes('pengguna')) return Users
   if (lower.includes('role') || lower.includes('hak akses')) return ShieldCheck
-  if (lower.includes('jadwal') || lower.includes('ibadah')) return Calendar
+  if (lower.includes('jadwal') || lower.includes('ibadah') || lower.includes('event')) return Calendar
 
   return Layers
-}
-
-const toggleSubmenu = (menuId) => {
-  openSubmenus[menuId] = !openSubmenus[menuId]
 }
 
 const isRouteActive = (path) => {
@@ -534,8 +464,12 @@ const handleKeyDown = (e) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('keydown', handleKeyDown)
+  // Ambil data menu riil dari database (tabel m_menus)
+  if (authStore.token) {
+    await authStore.fetchMyMenus()
+  }
 })
 
 onUnmounted(() => {

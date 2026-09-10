@@ -6,7 +6,8 @@ export const useAuthStore = defineStore('auth', {
     user: JSON.parse(localStorage.getItem('user') || 'null'),
     token: localStorage.getItem('token') || null,
     myMenus: [],
-    loading: false
+    loading: false,
+    loadingMenus: false
   }),
 
   getters: {
@@ -53,6 +54,7 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchMyMenus() {
       if (!this.token) return
+      this.loadingMenus = true
       try {
         const response = await apiClient.get('/menus/my-menus')
         if (response.success) {
@@ -61,6 +63,8 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         console.error('Gagal mengambil menu user:', error)
         this.myMenus = []
+      } finally {
+        this.loadingMenus = false
       }
     },
 
