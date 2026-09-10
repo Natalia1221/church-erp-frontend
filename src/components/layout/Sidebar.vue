@@ -12,38 +12,37 @@
       <div
         v-if="isMobileOpen"
         @click="$emit('closeMobile')"
-        class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs md:hidden"
+        class="fixed inset-0 z-40 bg-black/70 backdrop-blur-xs md:hidden"
       ></div>
     </transition>
 
     <!-- Sidebar Container -->
     <aside
       :class="[
-        'fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-slate-200/80 shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-all duration-300 ease-in-out md:static select-none',
+        'fixed inset-y-0 left-0 z-50 flex flex-col bg-[#0b1426] border-r border-[#15233e] shadow-[4px_0_24px_rgba(0,0,0,0.3)] transition-all duration-300 ease-in-out md:static select-none text-slate-200',
         // Mobile Drawer behavior
-        isMobileOpen ? 'translate-x-0 w-72' : '-translate-x-full md:translate-x-0',
+        isMobileOpen ? 'translate-x-0 w-64' : '-translate-x-full md:translate-x-0',
         // Desktop Collapse behavior
         isCollapsed ? 'md:w-20' : 'md:w-64'
       ]"
     >
-      <!-- Header Brand -->
-      <div class="h-16 flex items-center justify-between px-4 border-b border-slate-100 shrink-0">
+      <!-- 1. Header Brand -->
+      <div class="h-[70px] flex items-center justify-between px-4 border-b border-[#15233e] shrink-0">
         <div class="flex items-center gap-3 overflow-hidden">
-          <!-- Logo Icon -->
-          <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20 shrink-0 font-bold text-lg">
-            ✝
+          <!-- Logo Box (Square white box matching reference) -->
+          <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-md shadow-black/40 shrink-0 text-[#0b1426]">
+            <svg class="w-6 h-6 text-[#0b1426]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
           </div>
 
-          <!-- Brand Text (Collapsible) -->
-          <div
-            v-show="!isCollapsed"
-            class="min-w-0 transition-opacity duration-200"
-          >
-            <h1 class="text-sm font-bold tracking-tight text-slate-900 leading-none">
-              CHURCH <span class="text-indigo-600">ERP</span>
+          <!-- Brand Text (Hidden when collapsed) -->
+          <div v-show="!isCollapsed" class="min-w-0 transition-opacity duration-200">
+            <h1 class="text-sm font-extrabold tracking-wide text-white leading-tight truncate">
+              CHURCH <span class="text-cyan-400">ERP</span>
             </h1>
-            <p class="text-[11px] text-slate-400 font-medium mt-1">
-              Enterprise System v1.0
+            <p class="text-[11px] text-[#7e95b7] font-medium tracking-tight truncate">
+              ERP System v1.0
             </p>
           </div>
         </div>
@@ -51,97 +50,116 @@
         <!-- Mobile Close Button -->
         <button
           @click="$emit('closeMobile')"
-          class="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          class="md:hidden text-[#7e95b7] hover:text-white p-1 rounded-lg hover:bg-[#15233e] transition-colors"
         >
           <X class="w-5 h-5" />
         </button>
       </div>
 
-      <!-- Navigation Menu List -->
-      <div class="flex-1 overflow-y-auto px-3 py-4 space-y-1.5 custom-scroll">
-        <!-- Section Label -->
-        <div
-          v-if="!isCollapsed"
-          class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400"
-        >
-          Menu Utama
+      <!-- 2. Search Menu Box (Hidden when collapsed) -->
+      <div v-show="!isCollapsed" class="px-3 pt-3.5 pb-1 shrink-0">
+        <div class="relative">
+          <Search class="w-3.5 h-3.5 text-[#7e95b7] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            ref="searchInputRef"
+            v-model="searchQuery"
+            type="text"
+            placeholder="Cari Menu (Ctrl+K)"
+            class="w-full pl-8 pr-3 py-1.5 bg-[#101c34] border border-[#1c2e50] rounded-lg text-xs text-slate-200 placeholder-[#7e95b7] focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/50 transition-colors"
+          />
+          <span
+            v-if="searchQuery"
+            @click="searchQuery = ''"
+            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[#7e95b7] hover:text-white cursor-pointer"
+          >
+            ✕
+          </span>
+        </div>
+      </div>
+
+      <!-- 3. Navigation Menu List -->
+      <div class="flex-1 overflow-y-auto px-2.5 py-3 space-y-0.5 custom-scroll">
+        <!-- If searching and no match found -->
+        <div v-if="searchQuery && filteredNavList.length === 0" class="px-3 py-6 text-center text-xs text-[#7e95b7]">
+          Menu "{{ searchQuery }}" tidak ditemukan
         </div>
 
         <!-- Loop Menus -->
-        <div v-for="menu in menuList" :key="menu.id" class="space-y-1">
+        <div v-for="menu in filteredNavList" :key="menu.id" class="space-y-0.5">
           <!-- Single Menu Item without children -->
           <router-link
             v-if="!menu.children || menu.children.length === 0"
-            :to="menu.path"
+            :to="menu.path || '#'"
             @click="handleNavClick"
             :title="isCollapsed ? menu.name : undefined"
             :class="[
-              'group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
+              'group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
               isRouteActive(menu.path)
-                ? 'bg-indigo-50/80 text-indigo-600 font-semibold'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-              isCollapsed ? 'justify-center px-0' : ''
+                ? 'bg-[#16274a] text-white font-semibold'
+                : 'text-[#cbd5e1] hover:bg-[#12203a] hover:text-white',
+              isCollapsed ? 'justify-center px-0 py-2.5' : ''
             ]"
           >
             <component
-              :is="menu.iconComponent"
+              :is="getMenuIcon(menu.icon, menu.name)"
               :class="[
-                'w-5 h-5 shrink-0 transition-colors',
-                isRouteActive(menu.path) ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-700'
+                'w-4 h-4 shrink-0 transition-colors',
+                isRouteActive(menu.path) ? 'text-cyan-400' : 'text-[#94a3b8] group-hover:text-white'
               ]"
             />
-            <span v-show="!isCollapsed" class="truncate">{{ menu.name }}</span>
+            <span v-show="!isCollapsed" class="truncate text-[13px]">{{ menu.name }}</span>
           </router-link>
 
           <!-- Parent Menu with Accordion Submenu -->
-          <div v-else class="space-y-1">
+          <div v-else class="space-y-0.5">
             <button
               @click="toggleSubmenu(menu.id)"
               :title="isCollapsed ? menu.name : undefined"
               :class="[
-                'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
+                'w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
                 isParentActive(menu)
-                  ? 'text-indigo-600 bg-indigo-50/40 font-semibold'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                isCollapsed ? 'justify-center px-0' : ''
+                  ? 'bg-[#132342] text-white'
+                  : 'text-[#cbd5e1] hover:bg-[#12203a] hover:text-white',
+                isCollapsed ? 'justify-center px-0 py-2.5' : ''
               ]"
             >
               <div class="flex items-center gap-3 min-w-0">
                 <component
-                  :is="menu.iconComponent"
+                  :is="getMenuIcon(menu.icon, menu.name)"
                   :class="[
-                    'w-5 h-5 shrink-0 transition-colors',
-                    isParentActive(menu) ? 'text-indigo-600' : 'text-slate-400'
+                    'w-4 h-4 shrink-0 transition-colors',
+                    isParentActive(menu) ? 'text-cyan-400' : 'text-[#94a3b8]'
                   ]"
                 />
-                <span v-show="!isCollapsed" class="truncate">{{ menu.name }}</span>
+                <span v-show="!isCollapsed" class="truncate text-[13px] text-left">{{ menu.name }}</span>
               </div>
-              <ChevronDown
+              <ChevronRight
                 v-show="!isCollapsed"
                 :class="[
-                  'w-4 h-4 text-slate-400 transition-transform duration-200',
-                  openSubmenus[menu.id] ? 'rotate-180 text-slate-700' : ''
+                  'w-3.5 h-3.5 text-[#7e95b7] transition-transform duration-200 shrink-0',
+                  openSubmenus[menu.id] || searchQuery ? 'rotate-90 text-white' : ''
                 ]"
               />
             </button>
 
             <!-- Submenu Accordion Items -->
             <div
-              v-show="!isCollapsed && openSubmenus[menu.id]"
-              class="pl-9 pr-1 py-1 space-y-1 border-l-2 border-slate-100 ml-5"
+              v-show="!isCollapsed && (openSubmenus[menu.id] || searchQuery)"
+              class="pl-7 pr-1 py-0.5 space-y-0.5 border-l border-[#1a2d52] ml-5"
             >
               <router-link
                 v-for="sub in menu.children"
                 :key="sub.id"
-                :to="sub.path"
+                :to="sub.path || '#'"
                 @click="handleNavClick"
                 :class="[
-                  'flex items-center px-3 py-2 rounded-lg text-xs font-medium transition-colors',
+                  'flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
                   isRouteActive(sub.path)
-                    ? 'bg-indigo-50 text-indigo-600 font-semibold'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-[#1b2f56] text-white font-semibold'
+                    : 'text-[#94a3b8] hover:bg-[#142340] hover:text-white'
                 ]"
               >
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" :class="isRouteActive(sub.path) ? 'bg-cyan-400' : ''"></span>
                 <span class="truncate">{{ sub.name }}</span>
               </router-link>
             </div>
@@ -149,47 +167,129 @@
         </div>
       </div>
 
-      <!-- Bottom User Profile Bar -->
-      <div class="p-3 border-t border-slate-100 bg-slate-50/50 shrink-0">
-        <div
+      <!-- 4. Bottom User Profile Bar with Floating Popover -->
+      <div class="relative p-2.5 border-t border-[#15233e] bg-[#0b1426] shrink-0">
+        <!-- Floating Popover Card -->
+        <transition
+          enter-active-class="transition duration-150 ease-out"
+          enter-from-class="opacity-0 translate-y-2 scale-95"
+          enter-to-class="opacity-100 translate-y-0 scale-100"
+          leave-active-class="transition duration-100 ease-in"
+          leave-from-class="opacity-100 translate-y-0 scale-100"
+          leave-to-class="opacity-0 translate-y-2 scale-95"
+        >
+          <div
+            v-if="isProfilePopoverOpen"
+            class="absolute bottom-[68px] left-2.5 right-2.5 bg-[#111e38] border border-[#1e345e] rounded-xl shadow-2xl p-1.5 space-y-1 z-50"
+          >
+            <button
+              @click="openChangeRoleModal"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-[#182b4e] hover:text-white transition-colors text-left"
+            >
+              <UserCheck class="w-4 h-4 text-cyan-400 shrink-0" />
+              <span>Change Akses Repo</span>
+            </button>
+
+            <button
+              @click="handleLogout"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-red-300 hover:bg-red-500/10 hover:text-red-400 transition-colors text-left"
+            >
+              <LogOut class="w-4 h-4 text-red-400 shrink-0" />
+              <span>Logout</span>
+            </button>
+          </div>
+        </transition>
+
+        <!-- Profile Bar Button -->
+        <button
+          @click="isProfilePopoverOpen = !isProfilePopoverOpen"
           :class="[
-            'flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/60 shadow-xs transition-all',
-            isCollapsed ? 'justify-center p-1.5' : ''
+            'w-full flex items-center justify-between p-1.5 rounded-xl transition-all',
+            isProfilePopoverOpen ? 'bg-[#152442]' : 'hover:bg-[#101b33]',
+            isCollapsed ? 'justify-center p-1' : ''
           ]"
         >
-          <div class="flex items-center gap-3 min-w-0">
-            <!-- User Avatar Circle -->
-            <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center shrink-0">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <!-- User Avatar Circle in Cyan (#06b6d4) -->
+            <div class="w-8 h-8 rounded-full bg-[#06b6d4] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
               {{ getUserInitials() }}
             </div>
             <!-- Name & Role (Hidden when collapsed) -->
-            <div v-show="!isCollapsed" class="min-w-0">
-              <p class="text-xs font-bold text-slate-900 truncate">
-                {{ authStore.user?.name || 'Administrator' }}
+            <div v-show="!isCollapsed" class="text-left min-w-0">
+              <p class="text-[12.5px] font-bold text-white truncate leading-tight">
+                {{ authStore.user?.name || 'Admin Pusat' }}
               </p>
-              <p class="text-[10px] text-slate-500 truncate">
-                {{ authStore.userRoles[0]?.name || 'Admin Gereja' }}
+              <p class="text-[10.5px] text-[#7e95b7] truncate leading-tight mt-0.5">
+                {{ authStore.userRoles[0]?.code?.toLowerCase() || 'admin-pusat' }}
               </p>
             </div>
           </div>
 
-          <!-- Logout Button -->
-          <button
+          <!-- Caret Icon -->
+          <ChevronUp
             v-show="!isCollapsed"
-            @click="handleLogout"
-            title="Keluar"
-            class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+            :class="[
+              'w-3.5 h-3.5 text-[#7e95b7] transition-transform duration-200 shrink-0',
+              isProfilePopoverOpen ? 'rotate-180 text-white' : ''
+            ]"
+          />
+        </button>
+      </div>
+    </aside>
+
+    <!-- Modal Change Role / Akses Repo -->
+    <div
+      v-if="isChangeRoleModalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs"
+    >
+      <div class="bg-[#0f1b33] border border-[#1e345e] rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-[#1a2e54]">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <UserCheck class="w-4 h-4 text-cyan-400" />
+            <span>Peran & Hak Akses Aktif</span>
+          </h3>
+          <button @click="isChangeRoleModalOpen = false" class="text-[#7e95b7] hover:text-white">✕</button>
+        </div>
+
+        <p class="text-xs text-[#94a3b8]">
+          Pengguna: <strong class="text-white">{{ authStore.user?.name }}</strong>
+        </p>
+
+        <div class="space-y-2">
+          <div
+            v-for="r in authStore.userRoles"
+            :key="r.id"
+            class="p-2.5 rounded-xl bg-[#142342] border border-cyan-500/40 flex items-center justify-between text-xs"
           >
-            <LogOut class="w-4 h-4" />
+            <div>
+              <p class="font-bold text-white">{{ r.name }}</p>
+              <p class="text-[#7e95b7] font-mono text-[10px]">{{ r.code }}</p>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-semibold text-[10px]">
+              Aktif
+            </span>
+          </div>
+
+          <div v-if="!authStore.userRoles || authStore.userRoles.length === 0" class="text-xs text-[#7e95b7] italic py-2">
+            Belum ada role lain yang di-assign ke akun Anda.
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end">
+          <button
+            @click="isChangeRoleModalOpen = false"
+            class="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold"
+          >
+            Tutup
           </button>
         </div>
       </div>
-    </aside>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
@@ -198,8 +298,20 @@ import {
   ShieldCheck,
   Layers,
   Settings,
-  ChevronDown,
+  Search,
+  ChevronRight,
+  ChevronUp,
   LogOut,
+  UserCheck,
+  Calendar,
+  DollarSign,
+  FileCheck,
+  ShoppingCart,
+  Boxes,
+  Megaphone,
+  ShoppingBag,
+  Wrench,
+  Calculator,
   X
 } from 'lucide-vue-next'
 
@@ -220,46 +332,186 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
-// State Submenu
+// State
+const isProfilePopoverOpen = ref(false)
+const isChangeRoleModalOpen = ref(false)
+const searchQuery = ref('')
+const searchInputRef = ref(null)
+
 const openSubmenus = reactive({
-  master: true
+  setup: true,
+  purchasing: false,
+  inventory: false,
+  marketing: false,
+  ecommerce: false,
+  service: false,
+  accounting: false
 })
+
+// Menu Fallback Template matching the user's reference photo
+const defaultSystemMenus = [
+  {
+    id: 'dashboard',
+    name: 'Dashboard',
+    path: '/dashboard',
+    icon: 'LayoutDashboard'
+  },
+  {
+    id: 'approval',
+    name: 'Approval',
+    path: '/dashboard',
+    icon: 'FileCheck'
+  },
+  {
+    id: 'setup',
+    name: 'Setup',
+    icon: 'Settings',
+    children: [
+      { id: 'users', name: 'Manajemen Pengguna', path: '/users' },
+      { id: 'roles', name: 'Peran & Izin (RBAC)', path: '/roles' },
+      { id: 'menus', name: 'Daftar Menu Sistem', path: '/menus' }
+    ]
+  },
+  {
+    id: 'purchasing',
+    name: 'Purchasing',
+    icon: 'ShoppingCart',
+    children: [
+      { id: 'pur-1', name: 'Permintaan Barang', path: '/dashboard' },
+      { id: 'pur-2', name: 'Order Pembelian', path: '/dashboard' }
+    ]
+  },
+  {
+    id: 'inventory',
+    name: 'Inventory',
+    icon: 'Boxes',
+    children: [
+      { id: 'inv-1', name: 'Stok Barang', path: '/dashboard' },
+      { id: 'inv-2', name: 'Mutasi Gudang', path: '/dashboard' }
+    ]
+  },
+  {
+    id: 'marketing',
+    name: 'Marketing',
+    icon: 'Megaphone',
+    children: [
+      { id: 'mkt-1', name: 'Program Kegiatan', path: '/dashboard' }
+    ]
+  },
+  {
+    id: 'ecommerce',
+    name: 'E-Commerce',
+    icon: 'ShoppingBag',
+    children: [
+      { id: 'ec-1', name: 'Toko Buku & Donasi', path: '/dashboard' }
+    ]
+  },
+  {
+    id: 'service',
+    name: 'Service',
+    icon: 'Wrench',
+    children: [
+      { id: 'srv-1', name: 'Pemeliharaan Gedung', path: '/dashboard' }
+    ]
+  },
+  {
+    id: 'accounting',
+    name: 'Accounting',
+    icon: 'Calculator',
+    children: [
+      { id: 'acc-1', name: 'Kas Masuk & Keluar', path: '/dashboard' },
+      { id: 'acc-2', name: 'Laporan Keuangan', path: '/dashboard' }
+    ]
+  }
+]
+
+// Dynamic or Default Nav List
+const combinedNavList = computed(() => {
+  if (authStore.myMenus && authStore.myMenus.length > 0) {
+    return authStore.myMenus
+  }
+  return defaultSystemMenus
+})
+
+// Filter menu based on search query
+const filteredNavList = computed(() => {
+  if (!searchQuery.value.trim()) {
+    return combinedNavList.value
+  }
+
+  const query = searchQuery.value.toLowerCase()
+  return combinedNavList.value
+    .map(item => {
+      const parentMatches = item.name.toLowerCase().includes(query)
+      if (item.children && item.children.length > 0) {
+        const matchingChildren = item.children.filter(child =>
+          child.name.toLowerCase().includes(query)
+        )
+        if (matchingChildren.length > 0 || parentMatches) {
+          return {
+            ...item,
+            children: matchingChildren.length > 0 ? matchingChildren : item.children
+          }
+        }
+      }
+      return parentMatches ? item : null
+    })
+    .filter(Boolean)
+})
+
+// Dynamic Icon Resolver
+const getMenuIcon = (iconName, title = '') => {
+  const map = {
+    LayoutDashboard,
+    FileCheck,
+    Settings,
+    ShoppingCart,
+    Boxes,
+    Megaphone,
+    ShoppingBag,
+    Wrench,
+    Calculator,
+    Users,
+    ShieldCheck,
+    Calendar,
+    DollarSign
+  }
+
+  if (map[iconName]) return map[iconName]
+
+  const lower = title.toLowerCase()
+  if (lower.includes('dashboard')) return LayoutDashboard
+  if (lower.includes('approval') || lower.includes('setuju')) return FileCheck
+  if (lower.includes('setup') || lower.includes('pengaturan')) return Settings
+  if (lower.includes('purchase') || lower.includes('beli')) return ShoppingCart
+  if (lower.includes('inventory') || lower.includes('gudang') || lower.includes('stok')) return Boxes
+  if (lower.includes('market') || lower.includes('kegiatan')) return Megaphone
+  if (lower.includes('commerce') || lower.includes('toko')) return ShoppingBag
+  if (lower.includes('service') || lower.includes('pemeliharaan')) return Wrench
+  if (lower.includes('account') || lower.includes('kas') || lower.includes('keuangan')) return Calculator
+  if (lower.includes('user') || lower.includes('pengguna')) return Users
+  if (lower.includes('role') || lower.includes('hak akses')) return ShieldCheck
+  if (lower.includes('jadwal') || lower.includes('ibadah')) return Calendar
+
+  return Layers
+}
 
 const toggleSubmenu = (menuId) => {
   openSubmenus[menuId] = !openSubmenus[menuId]
 }
 
-// Navigasi Standar Bersih
-const menuList = [
-  {
-    id: 'dashboard',
-    name: 'Dashboard',
-    path: '/dashboard',
-    iconComponent: LayoutDashboard
-  },
-  {
-    id: 'master',
-    name: 'Master & RBAC',
-    iconComponent: Settings,
-    children: [
-      { id: 'users', name: 'Manajemen Pengguna', path: '/users' },
-      { id: 'roles', name: 'Peran & Hak Akses', path: '/roles' },
-      { id: 'menus', name: 'Daftar Menu Sistem', path: '/menus' }
-    ]
-  }
-]
-
 const isRouteActive = (path) => {
+  if (!path || path === '#') return false
   return route.path === path
 }
 
 const isParentActive = (menu) => {
   if (!menu.children) return false
-  return menu.children.some(child => route.path.startsWith(child.path))
+  return menu.children.some(child => child.path && route.path.startsWith(child.path))
 }
 
 const getUserInitials = () => {
-  const name = authStore.user?.name || 'Admin Gereja'
+  const name = authStore.user?.name || 'Admin Pusat'
   const parts = name.trim().split(' ')
   if (parts.length >= 2) {
     return (parts[0][0] + parts[1][0]).toUpperCase()
@@ -268,14 +520,46 @@ const getUserInitials = () => {
 }
 
 const handleNavClick = () => {
-  // Tutup drawer jika di mobile
   emit('closeMobile')
 }
 
+const openChangeRoleModal = () => {
+  isProfilePopoverOpen.value = false
+  isChangeRoleModalOpen.value = true
+}
+
 const handleLogout = () => {
+  isProfilePopoverOpen.value = false
   authStore.logout()
   router.push('/login')
 }
+
+// Global Keyboard Shortcut (Ctrl+K)
+const handleKeyDown = (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    if (searchInputRef.value) {
+      searchInputRef.value.focus()
+    }
+  }
+}
+
+const handleClickOutside = (e) => {
+  const target = e.target
+  if (!target.closest('aside')) {
+    isProfilePopoverOpen.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
@@ -286,10 +570,10 @@ const handleLogout = () => {
   background: transparent;
 }
 .custom-scroll::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
+  background: #1b2c50;
   border-radius: 9999px;
 }
 .custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
+  background: #253d6e;
 }
 </style>

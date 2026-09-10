@@ -1,16 +1,19 @@
 <template>
   <div class="space-y-6">
-    <!-- Welcome Header Banner (Clean Enterprise Light) -->
-    <div class="rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <!-- Welcome Header Banner (Dark Enterprise Navy) -->
+    <div class="relative overflow-hidden rounded-2xl bg-[#0b1426] border border-[#15233e] p-6 sm:p-8 shadow-2xl">
+      <!-- Ambient Glow -->
+      <div class="absolute -top-24 -right-24 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold mb-3">
-            ✨ Church ERP System v1.0
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold mb-3">
+            ✨ Church Enterprise System v1.0
           </div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Selamat Datang, {{ authStore.user?.name || 'Administrator' }}!
           </h1>
-          <p class="text-slate-500 text-sm mt-1 max-w-xl leading-relaxed">
+          <p class="text-[#7e95b7] text-sm mt-1.5 max-w-xl leading-relaxed">
             Sistem informasi terintegrasi untuk pengelolaan jadwal ibadah, absensi, keuangan kas, dan hak akses gereja.
           </p>
         </div>
@@ -18,14 +21,16 @@
         <div class="flex items-center gap-3 shrink-0">
           <router-link
             to="/users"
-            class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs transition-all shadow-sm flex items-center gap-2"
+            class="px-4 py-2.5 rounded-xl bg-[#162a52] hover:bg-[#1c3668] border border-[#23427f] text-white font-semibold text-xs transition-all shadow-md flex items-center gap-2"
           >
+            <span>👥</span>
             <span>Kelola User</span>
           </router-link>
           <router-link
             to="/roles"
-            class="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium text-xs transition-all flex items-center gap-2"
+            class="px-4 py-2.5 rounded-xl bg-[#101c34] hover:bg-[#152442] text-slate-200 border border-[#1c2e50] font-semibold text-xs transition-all flex items-center gap-2"
           >
+            <span>🛡️</span>
             <span>Hak Akses</span>
           </router-link>
         </div>
@@ -33,106 +38,106 @@
     </div>
 
     <!-- Quick Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
       <!-- Total Users -->
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:border-slate-300 transition-all">
+      <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-5 shadow-xl hover:border-[#1e345e] transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total Pengguna</p>
-            <p class="text-2xl font-bold text-slate-900 mt-1">{{ stats.users }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#7e95b7]">Total Pengguna</p>
+            <p class="text-2xl font-extrabold text-white mt-1">{{ stats.users }}</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
-            👥
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-lg font-bold">
+            👤
           </div>
         </div>
-        <div class="mt-3 flex items-center text-xs text-slate-500">
-          <span class="text-emerald-600 font-medium font-semibold">Aktif</span> &nbsp;di sistem
+        <div class="mt-3 flex items-center text-xs text-[#7e95b7]">
+          <span class="text-cyan-400 font-semibold">Aktif</span> &nbsp;di sistem gereja
         </div>
       </div>
 
       <!-- Total Roles -->
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:border-slate-300 transition-all">
+      <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-5 shadow-xl hover:border-[#1e345e] transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Peran Sistem</p>
-            <p class="text-2xl font-bold text-slate-900 mt-1">{{ stats.roles }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#7e95b7]">Peran Sistem</p>
+            <p class="text-2xl font-extrabold text-white mt-1">{{ stats.roles }}</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg font-bold">
             🛡️
           </div>
         </div>
-        <div class="mt-3 flex items-center text-xs text-slate-500">
-          Hak akses RBAC terpasang
+        <div class="mt-3 flex items-center text-xs text-[#7e95b7]">
+          Hak akses RBAC terproteksi
         </div>
       </div>
 
       <!-- Total Menus -->
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:border-slate-300 transition-all">
+      <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-5 shadow-xl hover:border-[#1e345e] transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Menu Terdaftar</p>
-            <p class="text-2xl font-bold text-slate-900 mt-1">{{ stats.menus }}</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#7e95b7]">Menu Terdaftar</p>
+            <p class="text-2xl font-extrabold text-white mt-1">{{ stats.menus }}</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-sm">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center text-lg font-bold">
             📑
           </div>
         </div>
-        <div class="mt-3 flex items-center text-xs text-slate-500">
+        <div class="mt-3 flex items-center text-xs text-[#7e95b7]">
           Navigasi dinamis
         </div>
       </div>
 
       <!-- Database Status -->
-      <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:border-slate-300 transition-all">
+      <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-5 shadow-xl hover:border-[#1e345e] transition-all">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Status Database</p>
-            <p class="text-2xl font-bold text-emerald-600 mt-1">Online</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[#7e95b7]">Status Database</p>
+            <p class="text-2xl font-extrabold text-emerald-400 mt-1">Online</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg font-bold">
             ⚡
           </div>
         </div>
-        <div class="mt-3 flex items-center text-xs text-slate-500">
+        <div class="mt-3 flex items-center text-xs text-emerald-400">
           TiDB Cloud MySQL
         </div>
       </div>
     </div>
 
     <!-- Modul Roadmap Cards -->
-    <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-      <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">
-        Modul ERP Gereja
+    <div class="bg-[#0b1426] border border-[#15233e] rounded-2xl p-6 shadow-xl">
+      <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4">
+        Rangkaian Modul ERP Gereja
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Module 1 -->
-        <div class="p-4 rounded-xl border border-indigo-100 bg-indigo-50/30">
+        <div class="p-4 rounded-xl bg-[#101c34] border border-[#1c2e50]">
           <div class="flex items-center justify-between mb-2">
             <span class="text-lg">🔐</span>
-            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold">Siap</span>
+            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold">Aktif</span>
           </div>
-          <h4 class="font-bold text-slate-900 text-sm">Modul 1: Otentikasi & RBAC</h4>
-          <p class="text-xs text-slate-500 mt-1">Users, Roles, Dynamic Menus, dan Audit Trail.</p>
+          <h4 class="font-bold text-white text-sm">Modul 1: Otentikasi & RBAC</h4>
+          <p class="text-xs text-[#7e95b7] mt-1">Users, Roles, Dynamic Menus, dan Audit Trail.</p>
         </div>
 
         <!-- Module 2 -->
-        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+        <div class="p-4 rounded-xl bg-[#101c34]/50 border border-[#172644]">
           <div class="flex items-center justify-between mb-2">
             <span class="text-lg">📅</span>
-            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">Berikutnya</span>
+            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">Berikutnya</span>
           </div>
-          <h4 class="font-bold text-slate-800 text-sm">Modul 2: Jadwal & Absensi</h4>
-          <p class="text-xs text-slate-500 mt-1">Jadwal ibadah, penugasan pelayan, dan absensi kehadiran.</p>
+          <h4 class="font-bold text-slate-200 text-sm">Modul 2: Jadwal & Absensi</h4>
+          <p class="text-xs text-[#7e95b7] mt-1">Jadwal ibadah, penugasan pelayan, dan absensi kehadiran.</p>
         </div>
 
         <!-- Module 3 -->
-        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+        <div class="p-4 rounded-xl bg-[#101c34]/50 border border-[#172644]">
           <div class="flex items-center justify-between mb-2">
             <span class="text-lg">💰</span>
-            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold">Rencana</span>
+            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Rencana</span>
           </div>
-          <h4 class="font-bold text-slate-800 text-sm">Modul 3: Keuangan Kas</h4>
-          <p class="text-xs text-slate-500 mt-1">Kas masuk (kolekte/donasi), kas keluar, dan mutasi.</p>
+          <h4 class="font-bold text-slate-200 text-sm">Modul 3: Keuangan Kas</h4>
+          <p class="text-xs text-[#7e95b7] mt-1">Kas masuk (kolekte/donasi), kas keluar, dan mutasi.</p>
         </div>
       </div>
     </div>

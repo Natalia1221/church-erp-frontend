@@ -1,11 +1,11 @@
 <template>
-  <header class="h-16 flex items-center justify-between px-4 sm:px-6 bg-white border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.02)] shrink-0 select-none">
+  <header class="h-[70px] flex items-center justify-between px-4 sm:px-6 bg-[#091122] border-b border-[#15233e] shrink-0 select-none">
     <!-- Left Section: Toggle Buttons & Page Title -->
     <div class="flex items-center gap-3">
       <!-- Desktop Sidebar Toggle Button (Collapse / Expand) -->
       <button
         @click="$emit('toggleCollapse')"
-        class="hidden md:flex items-center justify-center p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+        class="hidden md:flex items-center justify-center p-2 rounded-lg text-[#7e95b7] hover:text-white hover:bg-[#13203c] transition-colors"
         :title="isCollapsed ? 'Perluas Sidebar' : 'Kecilkan Sidebar'"
       >
         <PanelLeftClose v-if="!isCollapsed" class="w-5 h-5" />
@@ -15,42 +15,42 @@
       <!-- Mobile Hamburger Button -->
       <button
         @click="$emit('toggleMobile')"
-        class="md:hidden flex items-center justify-center p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+        class="md:hidden flex items-center justify-center p-2 rounded-lg text-[#7e95b7] hover:text-white hover:bg-[#13203c] transition-colors"
       >
         <Menu class="w-5 h-5" />
       </button>
 
       <!-- Page Title & Breadcrumbs -->
       <div>
-        <h2 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">
+        <h2 class="text-sm sm:text-base font-bold text-white leading-tight tracking-wide">
           {{ pageTitle }}
         </h2>
-        <p class="text-[11px] text-slate-400 font-medium hidden sm:block">
-          Sistem Informasi Administrasi Gereja
+        <p class="text-[11px] text-[#7e95b7] font-medium hidden sm:block">
+          Sistem Informasi Administrasi Gereja & Hak Akses
         </p>
       </div>
     </div>
 
-    <!-- Right Section: Status Badge, Date & Profile -->
+    <!-- Right Section: Status Badge, Date & Notification -->
     <div class="flex items-center gap-3 sm:gap-4">
       <!-- Server Status Badge -->
-      <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-xs font-semibold">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span class="hidden sm:inline">TiDB Cloud Connected</span>
         <span class="sm:hidden">Online</span>
       </div>
 
       <!-- Current Date -->
-      <div class="hidden lg:block text-xs font-medium text-slate-500 border-l border-slate-200 pl-4">
+      <div class="hidden lg:block text-xs font-medium text-[#7e95b7] border-l border-[#1c2e50] pl-4">
         {{ currentDate }}
       </div>
 
       <!-- Notification Bell -->
       <div class="relative hidden sm:block">
-        <button class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
-          <Bell class="w-5 h-5" />
+        <button class="p-2 rounded-lg text-[#7e95b7] hover:text-white hover:bg-[#13203c] transition-colors">
+          <Bell class="w-4 h-4" />
         </button>
-        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-600"></span>
+        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400"></span>
       </div>
     </div>
   </header>
