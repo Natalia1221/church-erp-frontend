@@ -36,6 +36,11 @@ const routes = [
         path: 'menus',
         name: 'Menus',
         component: () => import('@/views/menus/MenuListView.vue')
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('@/views/settings/SettingListView.vue')
       }
     ]
   },

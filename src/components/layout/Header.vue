@@ -82,6 +82,7 @@ const pageTitle = computed(() => {
   if (path.startsWith('/users')) return 'Manajemen Pengguna'
   if (path.startsWith('/roles')) return 'Peran & Hak Akses (RBAC)'
   if (path.startsWith('/menus')) return 'Daftar Menu Sistem'
+  if (path.startsWith('/settings')) return 'Pengaturan Sistem (m_settings)'
   return 'Dashboard Overview'
 })
 
