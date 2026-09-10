@@ -30,19 +30,17 @@
       <div class="h-[70px] flex items-center justify-between px-4 border-b border-[#15233e] shrink-0">
         <div class="flex items-center gap-3 overflow-hidden">
           <!-- Logo Box (Square white box matching reference) -->
-          <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-md shadow-black/40 shrink-0 text-[#0b1426]">
-            <svg class="w-6 h-6 text-[#0b1426]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
+          <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-md shadow-black/40 shrink-0 p-1">
+            <img src="/logo-hkbp.svg" alt="HKBP Logo" class="w-7 h-7 object-contain" />
           </div>
 
           <!-- Brand Text (Hidden when collapsed) -->
           <div v-show="!isCollapsed" class="min-w-0 transition-opacity duration-200">
             <h1 class="text-sm font-extrabold tracking-wide text-white leading-tight truncate">
-              CHURCH <span class="text-cyan-400">ERP</span>
+              HKBP <span class="text-cyan-400">ERP</span>
             </h1>
             <p class="text-[11px] text-[#7e95b7] font-medium tracking-tight truncate">
-              ERP System v1.0
+              Church ERP System
             </p>
           </div>
         </div>

@@ -9,17 +9,15 @@
       <div class="bg-white border border-slate-200 rounded-2xl p-7 sm:p-9 shadow-[0_12px_40px_rgba(0,0,0,0.06)]">
         <!-- Logo and Header -->
         <div class="text-center mb-7">
-          <!-- Logo Box: Bagian Gelap (#0b1426) yang senada dengan Sidebar -->
-          <div class="w-13 h-13 rounded-2xl bg-[#0b1426] border border-[#162544] flex items-center justify-center shadow-lg shadow-slate-900/15 mx-auto mb-3.5 text-white">
-            <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
+          <!-- Logo Box: Container Putih Bersih dengan Shadow Halus -->
+          <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-lg shadow-slate-900/10 mx-auto mb-3.5 p-2">
+            <img src="/logo-hkbp.svg" alt="HKBP Logo" class="w-12 h-12 object-contain" />
           </div>
           <h1 class="text-xl font-extrabold text-slate-900 tracking-wide">
-            CHURCH <span class="text-cyan-600">ERP</span>
+            HKBP <span class="text-cyan-600">ERP</span>
           </h1>
           <p class="text-slate-500 text-xs mt-1">
-            Enterprise System v1.0 • Portal Administrasi
+            Enterprise Church System • Portal Administrasi
           </p>
         </div>
 
