@@ -44,7 +44,7 @@
         @click="openAddMenuModal"
         class="px-5 py-2 rounded-xl border border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs self-start sm:self-auto"
       >
-        <span>Create New</span>
+        <span>+ Tambah Menu Baru</span>
       </button>
     </div>
 
@@ -68,7 +68,7 @@
           <input
             v-model="globalSearch"
             type="text"
-            placeholder="Cari menu..."
+            placeholder="Cari menu, modul, submodul..."
             class="w-full pl-9 pr-7 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-xs placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
           />
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">🔍</span>
@@ -81,7 +81,7 @@
           </button>
         </div>
 
-        <!-- Action Buttons Group (Red, Green, Blue, Slate) -->
+        <!-- Action Buttons Group (Delete, View, Edit, Duplicate) -->
         <div class="flex items-center gap-1.5">
           <!-- Delete (Red) -->
           <button
@@ -128,7 +128,7 @@
             <span class="text-sm">✏️</span>
           </button>
 
-          <!-- Duplicate / Copy (Dark Gray) -->
+          <!-- Duplicate / Copy (Slate) -->
           <button
             @click="handleDuplicateSelected"
             :disabled="!selectedMenu"
@@ -165,11 +165,10 @@
             <tr>
               <th class="py-3 px-4 w-12 text-center">No</th>
               <th class="py-3 px-4 min-w-[180px]">Menu Name</th>
-              <th class="py-3 px-4 min-w-[140px]">Module</th>
-              <th class="py-3 px-4 min-w-[140px]">Sub Module</th>
+              <th class="py-3 px-4 min-w-[140px]">Modul</th>
+              <th class="py-3 px-4 min-w-[140px]">Submodul</th>
               <th class="py-3 px-4 min-w-[200px]">Path</th>
               <th class="py-3 px-3 w-20 text-center">Sequence</th>
-              <th class="py-3 px-4 w-28 text-center">Need Approval</th>
               <th class="py-3 px-4 w-24 text-center">Status</th>
             </tr>
 
@@ -191,27 +190,27 @@
                 </div>
               </th>
 
-              <!-- Search Module -->
+              <!-- Search Modul -->
               <th class="py-2 px-3">
                 <div class="relative">
                   <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">▼</span>
                   <input
-                    v-model="filters.module"
+                    v-model="filters.modul"
                     type="text"
-                    placeholder="Search Module"
+                    placeholder="Search Modul"
                     class="w-full pl-6 pr-2 py-1 bg-slate-50/70 border border-slate-200 rounded-md text-[11px] placeholder-slate-400 font-normal focus:bg-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </th>
 
-              <!-- Search Sub Module -->
+              <!-- Search Submodul -->
               <th class="py-2 px-3">
                 <div class="relative">
                   <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">▼</span>
                   <input
-                    v-model="filters.sub_module"
+                    v-model="filters.submodul"
                     type="text"
-                    placeholder="Search Sub Module"
+                    placeholder="Search Submodul"
                     class="w-full pl-6 pr-2 py-1 bg-slate-50/70 border border-slate-200 rounded-md text-[11px] placeholder-slate-400 font-normal focus:bg-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
@@ -233,9 +232,6 @@
               <!-- Sequence Filter -->
               <th class="py-2 px-2 text-center"></th>
 
-              <!-- Need Approval Filter -->
-              <th class="py-2 px-2 text-center"></th>
-
               <!-- Status Filter -->
               <th class="py-2 px-2 text-center"></th>
             </tr>
@@ -245,7 +241,7 @@
           <tbody class="divide-y divide-slate-100 font-normal">
             <!-- Loading -->
             <tr v-if="loading">
-              <td colspan="8" class="py-12 text-center text-slate-400">
+              <td colspan="7" class="py-12 text-center text-slate-400">
                 <span class="inline-block w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2"></span>
                 Memuat data menu...
               </td>
@@ -253,7 +249,7 @@
 
             <!-- Empty -->
             <tr v-else-if="paginatedMenus.length === 0">
-              <td colspan="8" class="py-12 text-center text-slate-400">
+              <td colspan="7" class="py-12 text-center text-slate-400">
                 <p class="text-sm font-medium text-slate-600">Tidak ada data menu yang cocok.</p>
                 <p class="text-xs text-slate-400 mt-1">Coba sesuaikan filter pencarian atau buat menu baru.</p>
               </td>
@@ -284,14 +280,19 @@
                 {{ item.name }}
               </td>
 
-              <!-- Module -->
-              <td class="py-3 px-4 text-slate-600 text-xs">
-                {{ item.module || '-' }}
+              <!-- Modul -->
+              <td class="py-3 px-4 text-slate-700 text-xs font-medium">
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200/80 text-slate-800">
+                  📁 {{ item.modul || '-' }}
+                </span>
               </td>
 
-              <!-- Sub Module -->
+              <!-- Submodul -->
               <td class="py-3 px-4 text-slate-600 text-xs">
-                {{ item.sub_module || '-' }}
+                <span v-if="item.submodul" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50/70 border border-blue-100 text-blue-800 font-medium text-[11px]">
+                  📑 {{ item.submodul }}
+                </span>
+                <span v-else class="text-slate-400">-</span>
               </td>
 
               <!-- Path -->
@@ -302,18 +303,6 @@
               <!-- Sequence -->
               <td class="py-3 px-3 text-center text-slate-700 text-xs font-semibold">
                 {{ item.sequence ?? 0 }}
-              </td>
-
-              <!-- Need Approval -->
-              <td class="py-3 px-4 text-center">
-                <span
-                  :class="[
-                    'text-[11px] font-medium',
-                    item.need_approval ? 'text-blue-600 font-bold' : 'text-slate-500'
-                  ]"
-                >
-                  {{ item.need_approval ? 'Ya' : 'Tidak' }}
-                </span>
               </td>
 
               <!-- Status -->
@@ -399,51 +388,112 @@
       v-if="isModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
     >
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto custom-scroll">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-          <h3 class="text-base font-bold text-slate-900">
-            {{ isEditing ? 'Edit Menu Sistem' : 'Tambah Menu Baru' }}
-          </h3>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">
+              {{ isEditing ? 'Edit Menu Sistem' : 'Tambah Menu Baru' }}
+            </h3>
+            <p class="text-[11px] text-slate-500 mt-0.5">
+              Struktur Baru: Masukkan Modul, Submodul, Nama Menu, dan Path URL
+            </p>
+          </div>
           <button @click="isModalOpen = false" class="text-slate-400 hover:text-slate-600 cursor-pointer text-lg">✕</button>
         </div>
 
         <form @submit.prevent="saveMenu" class="space-y-4">
-          <!-- Menu Name -->
+          <!-- 1. MODUL INPUT -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Modul <span class="text-rose-500">*</span>
+              </label>
+              <button
+                type="button"
+                @click="toggleNewModul"
+                class="text-[11px] text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+              >
+                {{ isNewModul ? '← Pilih dari modul yang ada' : '+ Buat modul baru' }}
+              </button>
+            </div>
+
+            <!-- Dropdown Pilihan Modul -->
+            <select
+              v-if="!isNewModul"
+              v-model="form.modul"
+              required
+              class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 cursor-pointer"
+            >
+              <option value="" disabled>-- Pilih Modul --</option>
+              <option v-for="m in existingModules" :key="m" :value="m">📁 {{ m }}</option>
+            </select>
+
+            <!-- Input Teks Modul Baru -->
+            <input
+              v-else
+              v-model="form.modul"
+              type="text"
+              required
+              placeholder="Ketik nama modul baru (contoh: Penjadwalan, Setup, Keuangan)"
+              class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600"
+            />
+          </div>
+
+          <!-- 2. SUBMODUL DROPDOWN (Dari m_settings group m_submodule) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Submodul <span class="text-slate-400 font-normal lowercase">(opsional)</span>
+              </label>
+              <router-link
+                to="/settings"
+                class="text-[11px] text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                title="Kelola data m_settings"
+              >
+                ⚙️ Master m_settings
+              </router-link>
+            </div>
+
+            <select
+              v-model="form.submodul"
+              class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 cursor-pointer"
+            >
+              <option :value="null">-- Tidak ada submodul (Langsung di bawah Modul) --</option>
+              <option
+                v-for="sub in submoduleSettings"
+                :key="sub.id"
+                :value="sub.value1"
+              >
+                📑 {{ sub.value1 }}
+              </option>
+              <!-- Opsi fallback jika menu memiliki submodul yang belum ada di m_settings -->
+              <option
+                v-if="form.submodul && !submoduleSettings.some(s => s.value1 === form.submodul)"
+                :value="form.submodul"
+              >
+                📑 {{ form.submodul }}
+              </option>
+            </select>
+            <p class="text-[11px] text-slate-400 mt-1">
+              Pilihan diambil otomatis dari database <strong>m_settings</strong> (group: <code>m_submodule</code>).
+            </p>
+          </div>
+
+          <!-- 3. NAMA MENU -->
           <div>
             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Menu Name <span class="text-rose-500">*</span>
+              Nama Menu <span class="text-rose-500">*</span>
             </label>
             <input
               v-model="form.name"
               type="text"
               required
-              placeholder="Contoh: Jadwal Ibadah, Menu, Role"
+              placeholder="Contoh: Jadwal Ibadah, User, Role, Kategori Pelayanan"
               class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600"
             />
           </div>
 
-          <!-- Parent Menu / Module -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Parent Menu / Module
-            </label>
-            <select
-              v-model="form.parent_id"
-              class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600"
-            >
-              <option :value="null">-- Tidak ada parent (Top Level Module) --</option>
-              <option
-                v-for="p in parentOptions"
-                :key="p.id"
-                :value="p.id"
-                :disabled="isEditing && p.id === currentId"
-              >
-                {{ p.parent_id ? '└─ ' : '' }}{{ p.name }}
-              </option>
-            </select>
-          </div>
-
-          <!-- URL Path -->
+          <!-- 4. PATH URL -->
           <div>
             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
               Path URL
@@ -451,12 +501,12 @@
             <input
               v-model="form.path"
               type="text"
-              placeholder="Contoh: /menus, /penjadwalan/jadwal"
+              placeholder="Contoh: /penjadwalan/jadwal, /users (kosongkan jika grup menu)"
               class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm font-mono focus:bg-white focus:outline-none focus:border-blue-600"
             />
           </div>
 
-          <!-- Icon & Sequence in 2 Columns -->
+          <!-- 5. ICON & SEQUENCE -->
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
@@ -465,7 +515,7 @@
               <input
                 v-model="form.icon"
                 type="text"
-                placeholder="Contoh: Settings, Users"
+                placeholder="Contoh: Settings, Users, Calendar"
                 class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-xs focus:bg-white focus:outline-none focus:border-blue-600"
               />
             </div>
@@ -476,37 +526,26 @@
               <input
                 v-model.number="form.sequence"
                 type="number"
-                placeholder="1, 2, 3..."
+                step="any"
+                placeholder="1, 1.1, 2.5..."
                 class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-xs focus:bg-white focus:outline-none focus:border-blue-600"
               />
             </div>
           </div>
 
-          <!-- Checkboxes: Need Approval & Active Status -->
-          <div class="grid grid-cols-2 gap-3 pt-1">
-            <div class="flex items-center gap-2">
-              <input
-                v-model="form.need_approval"
-                type="checkbox"
-                id="needApprovalCheck"
-                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
-              />
-              <label for="needApprovalCheck" class="text-xs font-semibold text-slate-700 cursor-pointer">
-                Need Approval
-              </label>
-            </div>
-
-            <div class="flex items-center gap-2">
+          <!-- 6. STATUS ACTIVE -->
+          <div class="pt-1">
+            <label class="inline-flex items-center gap-2 cursor-pointer select-none">
               <input
                 v-model="form.is_active"
                 type="checkbox"
                 id="activeStatusCheck"
                 class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
               />
-              <label for="activeStatusCheck" class="text-xs font-semibold text-slate-700 cursor-pointer">
-                Status Active
-              </label>
-            </div>
+              <span class="text-xs font-semibold text-slate-700">
+                Status Active (Tampilkan di Sistem & Navigasi)
+              </span>
+            </label>
           </div>
 
           <!-- Form Buttons -->
@@ -514,14 +553,14 @@
             <button
               type="button"
               @click="isModalOpen = false"
-              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer"
+              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer transition-colors"
             >
               Batal
             </button>
             <button
               type="submit"
               :disabled="modalLoading"
-              class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-colors shadow-xs"
             >
               <span v-if="modalLoading" class="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
               <span>{{ isEditing ? 'Simpan Perubahan' : 'Tambah Menu' }}</span>
@@ -547,16 +586,16 @@
 
         <div class="space-y-2.5 text-xs text-slate-700">
           <div class="flex justify-between py-1.5 border-b border-slate-100">
-            <span class="text-slate-400">Menu Name:</span>
+            <span class="text-slate-400">Nama Menu:</span>
             <span class="font-bold text-slate-900">{{ viewingMenu?.name }}</span>
           </div>
           <div class="flex justify-between py-1.5 border-b border-slate-100">
-            <span class="text-slate-400">Module:</span>
-            <span class="font-semibold text-slate-800">{{ viewingMenu?.module || '-' }}</span>
+            <span class="text-slate-400">Modul:</span>
+            <span class="font-semibold text-slate-800">{{ viewingMenu?.modul || '-' }}</span>
           </div>
           <div class="flex justify-between py-1.5 border-b border-slate-100">
-            <span class="text-slate-400">Sub Module:</span>
-            <span class="font-semibold text-slate-800">{{ viewingMenu?.sub_module || '-' }}</span>
+            <span class="text-slate-400">Submodul:</span>
+            <span class="font-semibold text-slate-800">{{ viewingMenu?.submodul || '-' }}</span>
           </div>
           <div class="flex justify-between py-1.5 border-b border-slate-100">
             <span class="text-slate-400">Path URL:</span>
@@ -569,12 +608,6 @@
           <div class="flex justify-between py-1.5 border-b border-slate-100">
             <span class="text-slate-400">Sequence:</span>
             <span class="font-bold text-slate-800">{{ viewingMenu?.sequence }}</span>
-          </div>
-          <div class="flex justify-between py-1.5 border-b border-slate-100">
-            <span class="text-slate-400">Need Approval:</span>
-            <span class="font-semibold" :class="viewingMenu?.need_approval ? 'text-blue-600' : 'text-slate-600'">
-              {{ viewingMenu?.need_approval ? 'Ya' : 'Tidak' }}
-            </span>
           </div>
           <div class="flex justify-between py-1.5 border-b border-slate-100">
             <span class="text-slate-400">Status:</span>
@@ -614,7 +647,6 @@
           <p class="text-xs text-slate-500">
             Apakah Anda yakin ingin menghapus menu
             <strong class="text-slate-800">{{ deletingMenu?.name }}</strong>?
-            Submenu di bawahnya juga akan terhapus.
           </p>
         </div>
 
@@ -657,8 +689,8 @@ const statusTab = ref('all')
 const globalSearch = ref('')
 const filters = reactive({
   name: '',
-  module: '',
-  sub_module: '',
+  modul: '',
+  submodul: '',
   path: ''
 })
 
@@ -674,16 +706,23 @@ const viewingMenu = ref(null)
 const isDeleteModalOpen = ref(false)
 const deletingMenu = ref(null)
 
-// Form
+// Form State
 const form = reactive({
   name: '',
-  parent_id: null,
+  modul: '',
+  submodul: null,
   path: '',
   icon: 'Layers',
   sequence: 1,
-  need_approval: false,
   is_active: true
 })
+
+// Toggle untuk membuat modul baru vs pilih modul yang ada
+const isNewModul = ref(false)
+
+// Data dari m_settings
+const submoduleSettings = ref([])
+const moduleSettings = ref([])
 
 // Alert
 const alert = reactive({
@@ -694,6 +733,51 @@ const alert = reactive({
 // Pagination
 const currentPage = ref(1)
 const pageSize = ref(10)
+
+// Ambil data submodul dari m_settings (group: m_submodule)
+const fetchSubmoduleSettings = async () => {
+  try {
+    const res = await api.get('/settings?group=m_submodule')
+    if (res.success) {
+      submoduleSettings.value = (res.data || []).filter(s => s.status !== false)
+    }
+  } catch (error) {
+    console.error('Gagal mengambil data submodule dari m_settings:', error)
+  }
+}
+
+// Ambil data modul dari m_settings (group: m_module)
+const fetchModuleSettings = async () => {
+  try {
+    const res = await api.get('/settings?group=m_module')
+    if (res.success) {
+      moduleSettings.value = (res.data || []).filter(s => s.status !== false)
+    }
+  } catch (error) {
+    console.error('Gagal mengambil data modul dari m_settings:', error)
+  }
+}
+
+// Ambil semua modul unik yang sudah ada di database (gabungan m_settings & m_menus)
+const existingModules = computed(() => {
+  const mods = new Set()
+  moduleSettings.value.forEach(s => {
+    if (s.value1 && s.value1.trim()) mods.add(s.value1.trim())
+  })
+  menus.value.forEach(m => {
+    if (m.modul && m.modul !== '-') mods.add(m.modul.trim())
+  })
+  return Array.from(mods).sort()
+})
+
+const toggleNewModul = () => {
+  isNewModul.value = !isNewModul.value
+  if (isNewModul.value) {
+    form.modul = ''
+  } else {
+    form.modul = existingModules.value[0] || ''
+  }
+}
 
 // Ambil semua menu dari backend
 const fetchMenus = async () => {
@@ -711,11 +795,6 @@ const fetchMenus = async () => {
   }
 }
 
-// Opsi parent untuk dropdown modal
-const parentOptions = computed(() => {
-  return menus.value
-})
-
 // Filter data menu
 const filteredMenus = computed(() => {
   return menus.value.filter(item => {
@@ -727,20 +806,20 @@ const filteredMenus = computed(() => {
     if (globalSearch.value.trim()) {
       const q = globalSearch.value.toLowerCase()
       const matchName = item.name?.toLowerCase().includes(q)
-      const matchModule = item.module?.toLowerCase().includes(q)
-      const matchSub = item.sub_module?.toLowerCase().includes(q)
+      const matchModul = item.modul?.toLowerCase().includes(q)
+      const matchSubmodul = item.submodul?.toLowerCase().includes(q)
       const matchPath = item.path?.toLowerCase().includes(q)
-      if (!matchName && !matchModule && !matchSub && !matchPath) return false
+      if (!matchName && !matchModul && !matchSubmodul && !matchPath) return false
     }
 
     // 3. Column Filters
     if (filters.name.trim() && !item.name?.toLowerCase().includes(filters.name.toLowerCase().trim())) {
       return false
     }
-    if (filters.module.trim() && !item.module?.toLowerCase().includes(filters.module.toLowerCase().trim())) {
+    if (filters.modul.trim() && !item.modul?.toLowerCase().includes(filters.modul.toLowerCase().trim())) {
       return false
     }
-    if (filters.sub_module.trim() && !item.sub_module?.toLowerCase().includes(filters.sub_module.toLowerCase().trim())) {
+    if (filters.submodul.trim() && !item.submodul?.toLowerCase().includes(filters.submodul.toLowerCase().trim())) {
       return false
     }
     if (filters.path.trim() && !item.path?.toLowerCase().includes(filters.path.toLowerCase().trim())) {
@@ -792,12 +871,14 @@ const selectRow = (item) => {
 const openAddMenuModal = () => {
   isEditing.value = false
   currentId.value = null
+  isNewModul.value = existingModules.value.length === 0
+
   form.name = ''
-  form.parent_id = null
+  form.modul = existingModules.value[0] || ''
+  form.submodul = null
   form.path = ''
   form.icon = 'Layers'
   form.sequence = menus.value.length + 1
-  form.need_approval = false
   form.is_active = true
   isModalOpen.value = true
 }
@@ -806,12 +887,15 @@ const openEditMenuModal = (item) => {
   isEditing.value = true
   currentId.value = item.id
   form.name = item.name || ''
-  form.parent_id = item.parent_id || null
+  form.modul = item.modul || ''
+  form.submodul = item.submodul || null
   form.path = item.path || ''
   form.icon = item.icon || 'Layers'
   form.sequence = item.sequence ?? 1
-  form.need_approval = Boolean(item.need_approval)
   form.is_active = Boolean(item.is_active)
+
+  // Cek apakah modulnya ada di existingModules
+  isNewModul.value = item.modul ? !existingModules.value.includes(item.modul) : false
   isModalOpen.value = true
 }
 
@@ -842,11 +926,11 @@ const handleDuplicateSelected = async () => {
   try {
     const res = await api.post('/menus', {
       name: `${item.name} (Copy)`,
-      parent_id: item.parent_id,
+      modul: item.modul,
+      submodul: item.submodul,
       path: item.path ? `${item.path}-copy` : null,
       icon: item.icon,
       sequence: (item.sequence || 0) + 1,
-      need_approval: item.need_approval,
       is_active: item.is_active
     })
     if (res.success) {
@@ -860,10 +944,29 @@ const handleDuplicateSelected = async () => {
 }
 
 const saveMenu = async () => {
+  if (!form.modul || !form.modul.trim()) {
+    showAlert('Field Modul wajib diisi', 'error')
+    return
+  }
+  if (!form.name || !form.name.trim()) {
+    showAlert('Field Nama Menu wajib diisi', 'error')
+    return
+  }
+
   modalLoading.value = true
   try {
+    const payload = {
+      name: form.name.trim(),
+      modul: form.modul.trim(),
+      submodul: form.submodul && form.submodul.trim() ? form.submodul.trim() : null,
+      path: form.path && form.path.trim() ? form.path.trim() : null,
+      icon: form.icon && form.icon.trim() ? form.icon.trim() : 'Layers',
+      sequence: Number(form.sequence) || 0,
+      is_active: Boolean(form.is_active)
+    }
+
     if (isEditing.value) {
-      const res = await api.put(`/menus/${currentId.value}`, form)
+      const res = await api.put(`/menus/${currentId.value}`, payload)
       if (res.success) {
         showAlert('Menu berhasil diperbarui', 'success')
         isModalOpen.value = false
@@ -874,7 +977,7 @@ const saveMenu = async () => {
         showAlert(res.message || 'Gagal memperbarui menu', 'error')
       }
     } else {
-      const res = await api.post('/menus', form)
+      const res = await api.post('/menus', payload)
       if (res.success) {
         showAlert('Menu baru berhasil ditambahkan', 'success')
         isModalOpen.value = false
@@ -924,5 +1027,7 @@ const showAlert = (message, type = 'success') => {
 
 onMounted(() => {
   fetchMenus()
+  fetchSubmoduleSettings()
+  fetchModuleSettings()
 })
 </script>

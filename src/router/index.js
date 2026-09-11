@@ -33,9 +33,23 @@ const routes = [
         component: () => import('@/views/roles/RoleListView.vue')
       },
       {
+        path: 'setup/role',
+        name: 'SetupRole',
+        component: () => import('@/views/roles/RoleListView.vue')
+      },
+      {
         path: 'menus',
         name: 'Menus',
         component: () => import('@/views/menus/MenuListView.vue')
+      },
+      {
+        path: 'penjadwalan/kategori',
+        name: 'CategoryList',
+        component: () => import('@/views/categories/CategoryListView.vue')
+      },
+      {
+        path: 'categories',
+        redirect: '/penjadwalan/kategori'
       },
       {
         path: 'settings',
