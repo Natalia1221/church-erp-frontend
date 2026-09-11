@@ -34,13 +34,13 @@
         <form @submit.prevent="handleLogin" class="space-y-4">
           <div>
             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-              Alamat Email
+              Alamat Email / Username
             </label>
             <input
               v-model="email"
-              type="email"
+              type="text"
               required
-              placeholder="admin@gereja.com"
+              placeholder="admin@gereja.com / tes.admin"
               class="w-full px-4 py-2.5 rounded-xl bg-slate-50/70 border border-slate-300 text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-600/20 text-sm transition-all"
             />
           </div>
@@ -81,8 +81,9 @@
 
         <!-- Keterangan Login Bantuan -->
         <div class="mt-6 p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-          <p class="text-[11.5px] text-slate-600">
-            Kredensial Default: <code class="text-cyan-700 bg-cyan-50 border border-cyan-200/60 px-1.5 py-0.5 rounded font-mono font-medium">admin@gereja.com</code> / <code class="text-cyan-700 bg-cyan-50 border border-cyan-200/60 px-1.5 py-0.5 rounded font-mono font-medium">password123</code>
+          <p class="text-[11.5px] text-slate-600 leading-relaxed">
+            <span class="font-medium text-slate-700">Prod:</span> <code class="text-cyan-700 bg-cyan-50 border border-cyan-200/60 px-1 py-0.5 rounded font-mono">admin@gereja.com</code> (pass: <code class="text-cyan-700 bg-cyan-50 px-1 py-0.5 rounded font-mono">pass@1234</code>)<br>
+            <span class="font-medium text-slate-700">Dev:</span> <code class="text-cyan-700 bg-cyan-50 border border-cyan-200/60 px-1 py-0.5 rounded font-mono">tes.admin</code> (pass: <code class="text-cyan-700 bg-cyan-50 px-1 py-0.5 rounded font-mono">password123</code>)
           </p>
         </div>
       </div>
@@ -98,7 +99,7 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const email = ref('admin@gereja.com')
+const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
