@@ -52,6 +52,33 @@ const routes = [
         redirect: '/penjadwalan/kategori'
       },
       {
+        path: 'penjadwalan/jadwal/sermon',
+        name: 'SermonList',
+        component: () => import('@/views/sermons/SermonListView.vue')
+      },
+      {
+        path: 'sermon',
+        redirect: '/penjadwalan/jadwal/sermon'
+      },
+      {
+        path: 'penjadwalan/jadwal/minggu',
+        name: 'MingguList',
+        component: () => import('@/views/minggu/MingguListView.vue')
+      },
+      {
+        path: 'minggu',
+        redirect: '/penjadwalan/jadwal/minggu'
+      },
+      {
+        path: 'penjadwalan/jadwal/lainnya',
+        name: 'LainnyaList',
+        component: () => import('@/views/lainnya/LainnyaListView.vue')
+      },
+      {
+        path: 'lainnya',
+        redirect: '/penjadwalan/jadwal/lainnya'
+      },
+      {
         path: 'settings',
         name: 'Settings',
         component: () => import('@/views/settings/SettingListView.vue')

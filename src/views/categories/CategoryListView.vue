@@ -169,7 +169,6 @@
               <th class="py-3 px-3 min-w-[240px]">Deskripsi / Catatan</th>
               <th class="py-3 px-3 text-center w-28">Sequence</th>
               <th class="py-3 px-3 text-center w-28">Status</th>
-              <th class="py-3 px-4 text-center w-24">Aksi</th>
             </tr>
 
             <!-- Header Row 2: Per-column Filter Inputs -->
@@ -220,9 +219,6 @@
                   <option value="inactive">Inactive</option>
                 </select>
               </th>
-
-              <!-- Action Col -->
-              <th class="py-2 px-2 text-center"></th>
             </tr>
           </thead>
 
@@ -230,7 +226,7 @@
           <tbody class="divide-y divide-slate-100 font-normal">
             <!-- Loading -->
             <tr v-if="loading">
-              <td colspan="7" class="py-12 text-center text-slate-400">
+              <td colspan="6" class="py-12 text-center text-slate-400">
                 <span class="inline-block w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2"></span>
                 Memuat data kategori pelayanan...
               </td>
@@ -238,7 +234,7 @@
 
             <!-- Empty State -->
             <tr v-else-if="paginatedCategories.length === 0">
-              <td colspan="7" class="py-12 text-center text-slate-400">
+              <td colspan="6" class="py-12 text-center text-slate-400">
                 <p class="text-sm font-medium text-slate-600">Tidak ada data kategori pelayanan yang cocok.</p>
                 <p class="text-xs text-slate-400 mt-1">Coba sesuaikan filter pencarian atau buat kategori baru.</p>
               </td>
@@ -302,33 +298,6 @@
                 >
                   {{ item.is_active ? 'Active' : 'Inactive' }}
                 </span>
-              </td>
-
-              <!-- Action Inline -->
-              <td class="py-3 px-4 text-center" @click.stop>
-                <div class="flex items-center justify-center gap-1.5">
-                  <button
-                    @click="openViewModal(item)"
-                    class="p-1 rounded-md text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
-                    title="Detail"
-                  >
-                    👁️
-                  </button>
-                  <button
-                    @click="openEditModal(item)"
-                    class="p-1 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
-                    title="Edit"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    @click="confirmDelete(item)"
-                    class="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                    title="Hapus"
-                  >
-                    🗑️
-                  </button>
-                </div>
               </td>
             </tr>
           </tbody>
