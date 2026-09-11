@@ -79,6 +79,11 @@ const routes = [
         redirect: '/penjadwalan/jadwal/lainnya'
       },
       {
+        path: 'absensi',
+        name: 'AttendanceCheckIn',
+        component: () => import('@/views/attendance/AttendanceCheckInView.vue')
+      },
+      {
         path: 'settings',
         name: 'Settings',
         component: () => import('@/views/settings/SettingListView.vue')

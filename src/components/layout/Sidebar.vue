@@ -362,6 +362,7 @@ import {
   ShoppingBag,
   Wrench,
   Calculator,
+  ClipboardCheck,
   X
 } from 'lucide-vue-next'
 
@@ -446,12 +447,14 @@ const getMenuIcon = (iconName, title = '') => {
     ShieldCheck,
     Calendar,
     DollarSign,
-    Layers
+    Layers,
+    ClipboardCheck
   }
 
   if (map[iconName]) return map[iconName]
 
   const lower = (title || '').toLowerCase()
+  if (lower.includes('absen')) return ClipboardCheck
   if (lower.includes('dashboard')) return LayoutDashboard
   if (lower.includes('approval') || lower.includes('setuju')) return FileCheck
   if (lower.includes('setup') || lower.includes('pengaturan')) return Settings
