@@ -508,10 +508,12 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import apiClient from '@/api/axios'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 // View Mode: 'list' | 'form'
 const viewMode = ref('list')
@@ -805,6 +807,7 @@ const handleSubmitRole = async () => {
         alert.message = `Role "${roleForm.name}" dan hak aksesnya berhasil diperbarui!`
         backToList()
         await fetchRoles()
+        await authStore.fetchMyMenus()
       }
     } else {
       const res = await apiClient.post('/roles', payload)
@@ -813,6 +816,7 @@ const handleSubmitRole = async () => {
         alert.message = `Role baru "${roleForm.name}" berhasil dibuat!`
         backToList()
         await fetchRoles()
+        await authStore.fetchMyMenus()
       }
     }
   } catch (error) {
