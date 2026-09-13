@@ -402,41 +402,46 @@
         </div>
 
         <form @submit.prevent="saveMenu" class="space-y-4">
-          <!-- 1. MODUL INPUT -->
+          <!-- 1. MODUL DROPDOWN (Dari m_settings group m_module) -->
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
                 Modul <span class="text-rose-500">*</span>
               </label>
-              <button
-                type="button"
-                @click="toggleNewModul"
+              <router-link
+                to="/settings"
                 class="text-[11px] text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                title="Kelola data m_settings"
               >
-                {{ isNewModul ? '← Pilih dari modul yang ada' : '+ Buat modul baru' }}
-              </button>
+                ⚙️ Master m_settings
+              </router-link>
             </div>
 
-            <!-- Dropdown Pilihan Modul -->
+            <!-- Dropdown Pilihan Modul dari m_settings -->
             <select
-              v-if="!isNewModul"
               v-model="form.modul"
               required
               class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600 cursor-pointer"
             >
               <option value="" disabled>-- Pilih Modul --</option>
-              <option v-for="m in existingModules" :key="m" :value="m">📁 {{ m }}</option>
+              <option
+                v-for="m in sortedModuleSettings"
+                :key="m.id"
+                :value="m.value1"
+              >
+                📁 {{ m.value1 }}
+              </option>
+              <!-- Opsi fallback jika menu memiliki modul yang belum ada di m_settings -->
+              <option
+                v-if="form.modul && !sortedModuleSettings.some(s => s.value1 === form.modul)"
+                :value="form.modul"
+              >
+                📁 {{ form.modul }}
+              </option>
             </select>
-
-            <!-- Input Teks Modul Baru -->
-            <input
-              v-else
-              v-model="form.modul"
-              type="text"
-              required
-              placeholder="Ketik nama modul baru (contoh: Penjadwalan, Setup, Keuangan)"
-              class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-blue-600"
-            />
+            <p class="text-[11px] text-slate-400 mt-1">
+              Pilihan diambil otomatis dari database <strong>m_settings</strong> (group: <code>m_module</code>).
+            </p>
           </div>
 
           <!-- 2. SUBMODUL DROPDOWN (Dari m_settings group m_submodule) -->
@@ -717,9 +722,6 @@ const form = reactive({
   is_active: true
 })
 
-// Toggle untuk membuat modul baru vs pilih modul yang ada
-const isNewModul = ref(false)
-
 // Data dari m_settings
 const submoduleSettings = ref([])
 const moduleSettings = ref([])
@@ -758,26 +760,15 @@ const fetchModuleSettings = async () => {
   }
 }
 
-// Ambil semua modul unik yang sudah ada di database (gabungan m_settings & m_menus)
-const existingModules = computed(() => {
-  const mods = new Set()
-  moduleSettings.value.forEach(s => {
-    if (s.value1 && s.value1.trim()) mods.add(s.value1.trim())
+// Urutkan modul dari m_settings (group: m_module) berdasarkan sequence (value2) atau abjad
+const sortedModuleSettings = computed(() => {
+  return [...moduleSettings.value].sort((a, b) => {
+    const seqA = a.value2 !== null && a.value2 !== undefined && a.value2 !== '' ? Number(a.value2) : 999
+    const seqB = b.value2 !== null && b.value2 !== undefined && b.value2 !== '' ? Number(b.value2) : 999
+    if (seqA !== seqB) return seqA - seqB
+    return (a.value1 || '').localeCompare(b.value1 || '')
   })
-  menus.value.forEach(m => {
-    if (m.modul && m.modul !== '-') mods.add(m.modul.trim())
-  })
-  return Array.from(mods).sort()
 })
-
-const toggleNewModul = () => {
-  isNewModul.value = !isNewModul.value
-  if (isNewModul.value) {
-    form.modul = ''
-  } else {
-    form.modul = existingModules.value[0] || ''
-  }
-}
 
 // Ambil semua menu dari backend
 const fetchMenus = async () => {
@@ -869,12 +860,13 @@ const selectRow = (item) => {
 
 // Modal Handlers
 const openAddMenuModal = () => {
+  fetchModuleSettings()
+  fetchSubmoduleSettings()
   isEditing.value = false
   currentId.value = null
-  isNewModul.value = existingModules.value.length === 0
 
   form.name = ''
-  form.modul = existingModules.value[0] || ''
+  form.modul = sortedModuleSettings.value[0]?.value1 || ''
   form.submodul = null
   form.path = ''
   form.icon = 'Layers'
@@ -884,18 +876,17 @@ const openAddMenuModal = () => {
 }
 
 const openEditMenuModal = (item) => {
+  fetchModuleSettings()
+  fetchSubmoduleSettings()
   isEditing.value = true
   currentId.value = item.id
   form.name = item.name || ''
-  form.modul = item.modul || ''
+  form.modul = item.modul || (sortedModuleSettings.value[0]?.value1 || '')
   form.submodul = item.submodul || null
   form.path = item.path || ''
   form.icon = item.icon || 'Layers'
   form.sequence = item.sequence ?? 1
   form.is_active = Boolean(item.is_active)
-
-  // Cek apakah modulnya ada di existingModules
-  isNewModul.value = item.modul ? !existingModules.value.includes(item.modul) : false
   isModalOpen.value = true
 }
 

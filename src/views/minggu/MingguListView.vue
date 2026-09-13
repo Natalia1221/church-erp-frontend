@@ -141,9 +141,21 @@
 
               <!-- Jumlah Kehadiran (Dihitung dari t_attendances dengan id_event yang sesuai) -->
               <td class="py-3.5 px-4 text-center">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 font-semibold text-xs">
+                <div
+                  v-if="item.is_attendance"
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 font-semibold text-xs"
+                  title="Jumlah GSM yang sudah absen / Total GSM terdaftar"
+                >
                   <span>👥</span>
-                  <span>{{ item.total_attendance }} Kehadiran</span>
+                  <span>{{ item.attended_count }} / {{ item.total_attendance }} Kehadiran</span>
+                </div>
+                <div
+                  v-else
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-500 font-medium text-xs"
+                  title="Acara ini tidak melakukan absensi"
+                >
+                  <span class="text-slate-400">🚫</span>
+                  <span>Tidak Melakukan Absensi</span>
                 </div>
               </td>
 
@@ -483,6 +495,39 @@
         </div>
       </div>
     </div>
+
+    <!-- ==================== POP-UP PESAN ACARA SUDAH ADA ==================== -->
+    <div
+      v-if="duplicatePopup.isOpen"
+      class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+    >
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 max-w-sm w-full shadow-2xl space-y-4 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto text-2xl shadow-sm">
+          ⚠️
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900">
+            Acara Ibadah Minggu Sudah Ada!
+          </h3>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+            {{ duplicatePopup.message }}
+          </p>
+        </div>
+
+        <div v-if="duplicatePopup.existingTitle" class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left space-y-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Acara Terdaftar:</span>
+          <p class="text-xs font-mono font-bold text-emerald-700">{{ duplicatePopup.existingTitle }}</p>
+          <p class="text-[11px] text-slate-500">Tanggal: {{ formatTanggal(duplicatePopup.date) }}</p>
+        </div>
+
+        <button
+          @click="duplicatePopup.isOpen = false"
+          class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+        >
+          Mengerti & Ganti Tanggal
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -523,6 +568,21 @@ const form = reactive({
   is_attendance: true // Default mencentang checkbox MELAKUKAN ABSENSI
 })
 
+// Pop-up Peringatan Acara Sudah Ada
+const duplicatePopup = reactive({
+  isOpen: false,
+  message: '',
+  date: '',
+  existingTitle: ''
+})
+
+const showDuplicatePopup = (date, existingTitle, customMsg = '') => {
+  duplicatePopup.isOpen = true
+  duplicatePopup.date = date
+  duplicatePopup.existingTitle = existingTitle
+  duplicatePopup.message = customMsg || `Acara Ibadah Minggu untuk tanggal ${formatTanggal(date)} sudah terdaftar di sistem. Anda tidak dapat membuat acara Minggu ganda pada tanggal yang sama.`
+}
+
 // Pengecekan apakah tanggal yang dipilih jatuh pada hari Minggu (0 = Sunday)
 const isSundayDate = computed(() => {
   if (!form.event_date) return false
@@ -545,10 +605,14 @@ const formatTanggal = (dateStr) => {
   }
 }
 
-// Saat tanggal diinput, otomatis bentuk title MINGGU_TANGGAL
+// Saat tanggal diinput, otomatis bentuk title MINGGU_TANGGAL dan cek duplikasi
 const onDateChange = () => {
   if (form.event_date) {
     form.title = `MINGGU_${form.event_date}`
+    const existing = (mingguEvents.value || []).find(m => m.event_date === form.event_date)
+    if (existing) {
+      showDuplicatePopup(form.event_date, existing.title)
+    }
   } else {
     form.title = ''
   }
@@ -619,6 +683,13 @@ const submitCreateMinggu = async () => {
     return
   }
 
+  // Validasi: Tidak boleh ada acara Minggu dengan tanggal yang sama
+  const existing = (mingguEvents.value || []).find(m => m.event_date === form.event_date)
+  if (existing) {
+    showDuplicatePopup(form.event_date, existing.title)
+    return
+  }
+
   submitting.value = true
   alert.message = ''
   try {
@@ -635,8 +706,13 @@ const submitCreateMinggu = async () => {
       await fetchMinggu()
     }
   } catch (error) {
-    alert.type = 'error'
-    alert.message = error.message || 'Gagal membuat acara Minggu'
+    const errorMsg = error.response?.data?.message || error.message || 'Gagal membuat acara Minggu'
+    if (errorMsg.toLowerCase().includes('sudah ada') || errorMsg.toLowerCase().includes('duplikat')) {
+      showDuplicatePopup(form.event_date, form.title, errorMsg)
+    } else {
+      alert.type = 'error'
+      alert.message = errorMsg
+    }
   } finally {
     submitting.value = false
   }

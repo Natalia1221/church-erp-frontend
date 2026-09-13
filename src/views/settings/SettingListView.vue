@@ -397,6 +397,9 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import api from '@/api/axios'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const settings = ref([])
 const loading = ref(false)
@@ -514,6 +517,9 @@ const saveSetting = async () => {
         showAlert('Pengaturan berhasil diperbarui', 'success')
         isModalOpen.value = false
         await fetchSettings()
+        if (form.group === 'm_module' || form.group === 'm_submodule') {
+          await authStore.fetchMyMenus()
+        }
       } else {
         showAlert(res.message || 'Gagal memperbarui pengaturan', 'error')
       }
@@ -523,6 +529,9 @@ const saveSetting = async () => {
         showAlert('Pengaturan berhasil ditambahkan', 'success')
         isModalOpen.value = false
         await fetchSettings()
+        if (form.group === 'm_module' || form.group === 'm_submodule') {
+          await authStore.fetchMyMenus()
+        }
       } else {
         showAlert(res.message || 'Gagal menambahkan pengaturan', 'error')
       }
@@ -544,6 +553,9 @@ const toggleStatus = async (item) => {
     if (res.success) {
       item.status = newStatus
       showAlert(`Status '${item.key}' diubah menjadi ${newStatus ? 'Aktif' : 'Nonaktif'}`, 'success')
+      if (item.group === 'm_module' || item.group === 'm_submodule') {
+        await authStore.fetchMyMenus()
+      }
     }
   } catch (error) {
     showAlert('Gagal mengubah status', 'error')
@@ -564,6 +576,9 @@ const executeDelete = async () => {
       showAlert('Pengaturan berhasil dihapus', 'success')
       isDeleteModalOpen.value = false
       await fetchSettings()
+      if (deletingItem.value.group === 'm_module' || deletingItem.value.group === 'm_submodule') {
+        await authStore.fetchMyMenus()
+      }
     } else {
       showAlert(res.message || 'Gagal menghapus pengaturan', 'error')
     }

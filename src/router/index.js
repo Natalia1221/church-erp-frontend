@@ -79,9 +79,18 @@ const routes = [
         redirect: '/penjadwalan/jadwal/lainnya'
       },
       {
-        path: 'absensi',
+        path: 'absensi/check-in-acara',
         name: 'AttendanceCheckIn',
         component: () => import('@/views/attendance/AttendanceCheckInView.vue')
+      },
+      {
+        path: 'absensi/rekap-laporan',
+        name: 'AttendanceRecap',
+        component: () => import('@/views/attendance/AttendanceRecapView.vue')
+      },
+      {
+        path: 'absensi',
+        redirect: '/absensi/check-in-acara'
       },
       {
         path: 'settings',

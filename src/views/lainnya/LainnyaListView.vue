@@ -114,9 +114,21 @@
 
               <!-- Jumlah Kehadiran (Dihitung dari t_attendances dengan id_event yang sesuai) -->
               <td class="py-3.5 px-4 text-center">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-xs">
+                <div
+                  v-if="item.is_attendance"
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-xs"
+                  title="Jumlah GSM yang sudah absen / Total GSM terdaftar"
+                >
                   <span>👥</span>
-                  <span>{{ item.total_attendance }} Kehadiran</span>
+                  <span>{{ item.attended_count }} / {{ item.total_attendance }} Kehadiran</span>
+                </div>
+                <div
+                  v-else
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-500 font-medium text-xs"
+                  title="Acara ini tidak melakukan absensi"
+                >
+                  <span class="text-slate-400">🚫</span>
+                  <span>Tidak Melakukan Absensi</span>
                 </div>
               </td>
 

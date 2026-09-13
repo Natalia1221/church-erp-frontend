@@ -35,7 +35,7 @@
           <thead class="bg-slate-50/80 text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
             <tr>
               <th class="py-3.5 px-6 font-semibold">Nama Lengkap</th>
-              <th class="py-3.5 px-6 font-semibold">Email</th>
+              <th class="py-3.5 px-6 font-semibold">Email / Username</th>
               <th class="py-3.5 px-6 font-semibold">Peran (Role)</th>
               <th class="py-3.5 px-6 font-semibold">Status</th>
               <th class="py-3.5 px-6 font-semibold">Terdaftar</th>
@@ -138,13 +138,17 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Email</label>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">
+              Email / Username <span class="text-rose-500">*</span>
+            </label>
             <input
               v-model="form.email"
-              type="email"
+              type="text"
               required
+              placeholder="Contoh: gsm3 atau nama@gereja.com"
               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
             />
+            <p class="text-[11px] text-slate-400 mt-1">Dapat diisi alamat email atau username (tanpa spasi).</p>
           </div>
 
           <div>
