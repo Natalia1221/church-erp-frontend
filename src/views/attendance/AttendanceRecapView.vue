@@ -340,6 +340,7 @@
               Reset
             </button>
             <button
+              v-if="canPrint"
               @click="exportToExcel"
               class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
               title="Unduh Data Excel (.csv)"
@@ -348,6 +349,7 @@
               <span>Unduh Excel</span>
             </button>
             <button
+              v-if="canPrint"
               @click="printRecapReport"
               class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
               title="Cetak Laporan Resmi"
@@ -818,7 +820,11 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { usePermissions } from '@/composables/usePermissions'
 import axios from '@/api/axios'
+
+const authStore = useAuthStore()
+const { canRead, canCreate, canShow, canUpdate, canDelete, canPrint } = usePermissions()
 import {
   ClipboardCheck,
   CheckCircle2,
@@ -840,8 +846,6 @@ import {
   TrendingUp,
   UserX
 } from 'lucide-vue-next'
-
-const authStore = useAuthStore()
 
 // Tab state: 'recap' (default) | 'monitoring'
 const activeTab = ref('recap')

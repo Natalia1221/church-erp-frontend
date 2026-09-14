@@ -302,7 +302,7 @@
             <!-- ========================================== -->
             <!-- A. MODE KHUSUS ADMINISTRATOR / PENDETA     -->
             <!-- ========================================== -->
-            <div v-if="isAdminOrPendeta" class="space-y-2">
+            <div v-if="isAdminOrPendeta && (canUpdate || canCreate)" class="space-y-2">
               <!-- Tombol Utama: Kelola Kehadiran GSM & Revisi Absensi -->
               <button
                 @click="openAdminManageModal(evt)"
@@ -398,6 +398,7 @@
                   </div>
 
                   <button
+                    v-if="canCreate"
                     @click="openCheckInModal(evt)"
                     :disabled="submittingEventId === evt.id"
                     class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#0b1426] to-[#152a52] hover:from-[#11203d] hover:to-[#1c386d] text-white font-bold text-xs sm:text-sm shadow-md shadow-slate-900/15 transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
@@ -952,7 +953,11 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { usePermissions } from '@/composables/usePermissions'
 import axios from '@/api/axios'
+
+const authStore = useAuthStore()
+const { canRead, canCreate, canShow, canUpdate, canDelete, canPrint } = usePermissions()
 import {
   Calendar,
   Clock,
@@ -975,8 +980,6 @@ import {
   ShieldAlert,
   Check
 } from 'lucide-vue-next'
-
-const authStore = useAuthStore()
 
 // Tab State: 'checkin' | 'history'
 const activeTab = ref('checkin')

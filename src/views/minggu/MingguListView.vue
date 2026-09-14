@@ -8,6 +8,7 @@
       </div>
 
       <button
+        v-if="canCreate"
         @click="openAddModal"
         class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
       >
@@ -163,6 +164,7 @@
               <td class="py-3.5 px-4 text-center">
                 <div class="flex items-center justify-center gap-1.5">
                   <button
+                    v-if="canUpdate"
                     @click="openAssignmentModal(item)"
                     class="px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
                     title="Atur Penugasan Pelayanan GSM"
@@ -171,6 +173,16 @@
                     <span>Pelayanan</span>
                   </button>
                   <button
+                    v-if="canUpdate"
+                    @click="openEditModal(item)"
+                    class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                    title="Edit Acara Minggu"
+                  >
+                    <span>✏️</span>
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    v-if="canShow"
                     @click="openDetailModal(item)"
                     class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
                     title="Lihat Daftar GSM yang Berhadir"
@@ -179,6 +191,7 @@
                     <span>Detail</span>
                   </button>
                   <button
+                    v-if="canDelete"
                     @click="handleDelete(item)"
                     class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                     title="Hapus Acara"
@@ -194,11 +207,12 @@
     </div>
 
     <!-- ==================== MODAL TAMBAH MINGGU ==================== -->
-    <div
-      v-if="isAddModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto"
-    >
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-md shadow-2xl space-y-5 my-auto">
+    <Teleport to="body">
+      <div
+        v-if="isAddModalOpen"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto"
+      >
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-md shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] space-y-5 my-auto">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
             <h3 class="text-base font-bold text-slate-900">Tambah Acara Minggu Baru</h3>
@@ -283,6 +297,24 @@
             </p>
           </div>
 
+          <!-- 4. Checkbox ADA PERSEMBAHAN (Default Tercentang) -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                v-model="form.is_persembahan"
+                type="checkbox"
+                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer w-4 h-4"
+              />
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                <span>💰</span>
+                <span>Ada Persembahan</span>
+              </span>
+            </label>
+            <p class="text-[11px] text-slate-500 leading-relaxed pl-6">
+              Jika dicentang, acara ini akan masuk ke halaman <strong>Persembahan</strong> untuk pencatatan dan rekapitulasi kas keuangan.
+            </p>
+          </div>
+
           <!-- Actions -->
           <div class="pt-3 flex items-center justify-end gap-3 border-t border-slate-100">
             <button
@@ -303,13 +335,139 @@
         </form>
       </div>
     </div>
+  </Teleport>
+
+    <!-- ==================== MODAL EDIT ACARA MINGGU ==================== -->
+    <Teleport to="body">
+      <div
+        v-if="isEditModalOpen"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto"
+      >
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-md shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] space-y-5 my-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Edit Acara Minggu</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Ubah tanggal acara, status absensi, dan opsi persembahan</p>
+          </div>
+          <button @click="isEditModalOpen = false" class="text-slate-400 hover:text-slate-600 cursor-pointer text-lg">✕</button>
+        </div>
+
+        <form @submit.prevent="submitUpdateMinggu" class="space-y-4">
+          <!-- 1. Input Tanggal (Harus Hari Minggu) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Tanggal Acara <span class="text-rose-500">*</span>
+              </label>
+              <span class="text-[10px] text-emerald-600 font-medium font-semibold">Harus Hari Minggu</span>
+            </div>
+            <input
+              v-model="editForm.event_date"
+              @change="onEditDateChange"
+              @input="onEditDateChange"
+              type="date"
+              required
+              :class="[
+                'w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border text-slate-900 text-sm focus:bg-white focus:outline-none transition-colors cursor-pointer',
+                editForm.event_date && !isEditSundayDate
+                  ? 'border-rose-400 focus:border-rose-500 bg-rose-50/30'
+                  : 'border-slate-300 focus:border-indigo-600'
+              ]"
+            />
+
+            <!-- Indikator Validasi Hari Minggu -->
+            <div v-if="editForm.event_date" class="mt-1.5">
+              <p v-if="!isEditSundayDate" class="text-[11px] text-rose-600 font-semibold flex items-center gap-1">
+                <span>⚠️</span>
+                <span>Tanggal yang dipilih bukan hari Minggu!</span>
+              </p>
+              <p v-else class="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+                <span>✓</span>
+                <span>Tanggal valid: Hari Minggu</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- 2. Acara / Title (Terbentuk Otomatis) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Acara / Title <span class="text-slate-400 font-normal lowercase">(read-only)</span>
+              </label>
+              <span class="text-[10px] text-indigo-600 font-medium">Format: MINGGU_TANGGAL</span>
+            </div>
+            <input
+              v-model="editForm.title"
+              type="text"
+              readonly
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 font-mono text-sm focus:outline-none cursor-not-allowed font-bold"
+            />
+          </div>
+
+          <!-- 3. Checkbox MELAKUKAN ABSENSI -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                v-model="editForm.is_attendance"
+                type="checkbox"
+                class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer w-4 h-4"
+              />
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">
+                Melakukan Absensi
+              </span>
+            </label>
+            <p class="text-[11px] text-slate-500 leading-relaxed pl-6">
+              Status absensi untuk seluruh user GSM pada acara Minggu ini.
+            </p>
+          </div>
+
+          <!-- 4. Checkbox ADA PERSEMBAHAN -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                v-model="editForm.is_persembahan"
+                type="checkbox"
+                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer w-4 h-4"
+              />
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                <span>💰</span>
+                <span>Ada Persembahan</span>
+              </span>
+            </label>
+            <p class="text-[11px] text-slate-500 leading-relaxed pl-6">
+              Jika dicentang, acara ini akan tampil di halaman <strong>Persembahan</strong> untuk pencatatan kas keuangan.
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div class="pt-3 flex items-center justify-end gap-3 border-t border-slate-100">
+            <button
+              type="button"
+              @click="isEditModalOpen = false"
+              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              :disabled="submitting || !editForm.event_date || !isEditSundayDate"
+              class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {{ submitting ? 'Menyimpan...' : 'Simpan Perubahan' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </Teleport>
 
     <!-- ==================== MODAL ATUR PENUGASAN PELAYANAN ==================== -->
-    <div
-      v-if="isAssignmentModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto"
-    >
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-5 my-auto max-h-[90vh] flex flex-col">
+    <Teleport to="body">
+      <div
+        v-if="isAssignmentModalOpen"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto"
+      >
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-lg shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] space-y-5 my-auto max-h-[90vh] flex flex-col">
         <!-- Header -->
         <div class="flex items-start justify-between pb-3 border-b border-slate-100 shrink-0">
           <div>
@@ -389,13 +547,15 @@
         </div>
       </div>
     </div>
+  </Teleport>
 
     <!-- ==================== MODAL DETAIL KEHADIRAN GSM ==================== -->
-    <div
-      v-if="isDetailModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto"
-    >
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-2xl shadow-2xl space-y-5 my-auto max-h-[90vh] flex flex-col">
+    <Teleport to="body">
+      <div
+        v-if="isDetailModalOpen"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto"
+      >
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] space-y-5 my-auto max-h-[90vh] flex flex-col">
         <!-- Header -->
         <div class="flex items-start justify-between pb-3 border-b border-slate-100 shrink-0">
           <div>
@@ -495,13 +655,15 @@
         </div>
       </div>
     </div>
+  </Teleport>
 
     <!-- ==================== POP-UP PESAN ACARA SUDAH ADA ==================== -->
-    <div
-      v-if="duplicatePopup.isOpen"
-      class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
-    >
-      <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 max-w-sm w-full shadow-2xl space-y-4 text-center">
+    <Teleport to="body">
+      <div
+        v-if="duplicatePopup.isOpen"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto"
+      >
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 max-w-sm w-full shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] space-y-4 text-center my-auto">
         <div class="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto text-2xl shadow-sm">
           ⚠️
         </div>
@@ -528,12 +690,16 @@
         </button>
       </div>
     </div>
+  </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import apiClient from '@/api/axios'
+import { usePermissions } from '@/composables/usePermissions'
+
+const { canRead, canCreate, canShow, canUpdate, canDelete, canPrint } = usePermissions()
 
 const mingguEvents = ref([])
 const loading = ref(false)
@@ -542,6 +708,7 @@ const savingAssignments = ref(false)
 const searchQuery = ref('')
 
 const isAddModalOpen = ref(false)
+const isEditModalOpen = ref(false)
 const isDetailModalOpen = ref(false)
 const isAssignmentModalOpen = ref(false)
 
@@ -565,8 +732,37 @@ const alert = reactive({
 const form = reactive({
   event_date: '',
   title: '',
-  is_attendance: true // Default mencentang checkbox MELAKUKAN ABSENSI
+  is_attendance: true, // Default mencentang checkbox MELAKUKAN ABSENSI
+  is_persembahan: true // Default mencentang checkbox ADA PERSEMBAHAN
 })
+
+const editForm = reactive({
+  id: null,
+  event_date: '',
+  title: '',
+  is_attendance: true,
+  is_persembahan: true
+})
+
+const isEditSundayDate = computed(() => {
+  if (!editForm.event_date) return false
+  const d = new Date(`${editForm.event_date}T00:00:00`)
+  return !isNaN(d.getTime()) && d.getDay() === 0
+})
+
+const onEditDateChange = () => {
+  if (editForm.event_date) {
+    editForm.title = `MINGGU_${editForm.event_date}`
+    const existing = (mingguEvents.value || []).find(
+      m => m.event_date === editForm.event_date && m.id !== editForm.id
+    )
+    if (existing) {
+      showDuplicatePopup(editForm.event_date, existing.title)
+    }
+  } else {
+    editForm.title = ''
+  }
+}
 
 // Pop-up Peringatan Acara Sudah Ada
 const duplicatePopup = reactive({
@@ -666,6 +862,7 @@ const openAddModal = () => {
   form.event_date = defaultSunday
   form.title = `MINGGU_${defaultSunday}`
   form.is_attendance = true // Default tercentang
+  form.is_persembahan = true // Default tercentang
   isAddModalOpen.value = true
 }
 
@@ -695,7 +892,8 @@ const submitCreateMinggu = async () => {
   try {
     const payload = {
       event_date: form.event_date,
-      is_attendance: Boolean(form.is_attendance)
+      is_attendance: Boolean(form.is_attendance),
+      is_persembahan: Boolean(form.is_persembahan)
     }
 
     const res = await apiClient.post('/minggu', payload)
@@ -713,6 +911,63 @@ const submitCreateMinggu = async () => {
       alert.type = 'error'
       alert.message = errorMsg
     }
+  } finally {
+    submitting.value = false
+  }
+}
+
+// Buka Modal Edit
+const openEditModal = (item) => {
+  editForm.id = item.id
+  editForm.event_date = item.event_date
+  editForm.title = item.title
+  editForm.is_attendance = Boolean(item.is_attendance)
+  editForm.is_persembahan = item.is_persembahan !== undefined ? Boolean(item.is_persembahan) : true
+  isEditModalOpen.value = true
+}
+
+// Submit Update Acara Minggu
+const submitUpdateMinggu = async () => {
+  if (!editForm.event_date) {
+    alert.type = 'error'
+    alert.message = 'Tanggal acara wajib dipilih'
+    return
+  }
+
+  if (!isEditSundayDate.value) {
+    alert.type = 'error'
+    alert.message = 'Tanggal yang dipilih haruslah hari Minggu!'
+    return
+  }
+
+  const existing = (mingguEvents.value || []).find(
+    m => m.event_date === editForm.event_date && m.id !== editForm.id
+  )
+  if (existing) {
+    showDuplicatePopup(editForm.event_date, existing.title)
+    return
+  }
+
+  submitting.value = true
+  alert.message = ''
+  try {
+    const payload = {
+      event_date: editForm.event_date,
+      is_attendance: Boolean(editForm.is_attendance),
+      is_persembahan: Boolean(editForm.is_persembahan)
+    }
+
+    const res = await apiClient.put(`/minggu/${editForm.id}`, payload)
+    if (res.success) {
+      alert.type = 'success'
+      alert.message = `Acara "${res.data?.title || editForm.title}" berhasil diperbarui!`
+      isEditModalOpen.value = false
+      await fetchMinggu()
+    }
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || error.message || 'Gagal memperbarui acara Minggu'
+    alert.type = 'error'
+    alert.message = errorMsg
   } finally {
     submitting.value = false
   }

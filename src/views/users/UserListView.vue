@@ -8,6 +8,7 @@
       </div>
 
       <button
+        v-if="canCreate"
         @click="openAddModal"
         class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-all shadow-sm flex items-center justify-center gap-2"
       >
@@ -95,12 +96,14 @@
               </td>
               <td class="py-4 px-6 text-right space-x-2">
                 <button
+                  v-if="canUpdate"
                   @click="openEditModal(user)"
                   class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
                 >
                   Edit
                 </button>
                 <button
+                  v-if="canDelete"
                   @click="handleDelete(user)"
                   class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
                 >
@@ -211,6 +214,9 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import apiClient from '@/api/axios'
+import { usePermissions } from '@/composables/usePermissions'
+
+const { canRead, canCreate, canShow, canUpdate, canDelete, canPrint } = usePermissions()
 
 const users = ref([])
 const rolesList = ref([])

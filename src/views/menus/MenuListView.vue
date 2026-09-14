@@ -41,6 +41,7 @@
 
       <!-- Create New Button -->
       <button
+        v-if="canCreate"
         @click="openAddMenuModal"
         class="px-5 py-2 rounded-xl border border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs self-start sm:self-auto"
       >
@@ -85,6 +86,7 @@
         <div class="flex items-center gap-1.5">
           <!-- Delete (Red) -->
           <button
+            v-if="canDelete"
             @click="handleDeleteSelected"
             :disabled="!selectedMenu"
             :class="[
@@ -100,6 +102,7 @@
 
           <!-- View Detail (Green) -->
           <button
+            v-if="canShow"
             @click="handleViewSelected"
             :disabled="!selectedMenu"
             :class="[
@@ -115,6 +118,7 @@
 
           <!-- Edit (Blue) -->
           <button
+            v-if="canUpdate"
             @click="handleEditSelected"
             :disabled="!selectedMenu"
             :class="[
@@ -130,6 +134,7 @@
 
           <!-- Duplicate / Copy (Slate) -->
           <button
+            v-if="canCreate"
             @click="handleDuplicateSelected"
             :disabled="!selectedMenu"
             :class="[
@@ -679,8 +684,10 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import api from '@/api/axios'
 import { useAuthStore } from '@/stores/auth'
+import { usePermissions } from '@/composables/usePermissions'
 
 const authStore = useAuthStore()
+const { canRead, canCreate, canShow, canUpdate, canDelete, canPrint } = usePermissions()
 
 const menus = ref([])
 const loading = ref(false)

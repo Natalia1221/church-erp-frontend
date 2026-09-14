@@ -8,6 +8,7 @@
       </div>
 
       <button
+        v-if="canCreate"
         @click="openAddModal"
         class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
       >
@@ -179,8 +180,10 @@
               <td class="py-3.5 px-5 text-center">
                 <button
                   @click="toggleStatus(item)"
+                  :disabled="!canUpdate"
                   :class="[
-                    'px-2.5 py-0.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-80 cursor-pointer',
+                    'px-2.5 py-0.5 rounded-full text-xs font-semibold transition-opacity',
+                    canUpdate ? 'hover:opacity-80 cursor-pointer' : 'opacity-60 cursor-not-allowed',
                     item.status ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'
                   ]"
                   :title="item.status ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan'"
@@ -193,6 +196,7 @@
               <td class="py-3.5 px-5 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <button
+                    v-if="canUpdate"
                     @click="openEditModal(item)"
                     class="p-1.5 text-slate-400 hover:text-cyan-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                     title="Edit Pengaturan"
@@ -200,6 +204,7 @@
                     ✏️
                   </button>
                   <button
+                    v-if="canDelete"
                     @click="confirmDelete(item)"
                     class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                     title="Hapus Pengaturan"
@@ -398,8 +403,10 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import api from '@/api/axios'
 import { useAuthStore } from '@/stores/auth'
+import { usePermissions } from '@/composables/usePermissions'
 
 const authStore = useAuthStore()
+const { canRead, canCreate, canShow, canUpdate, canDelete, canPrint } = usePermissions()
 
 const settings = ref([])
 const loading = ref(false)

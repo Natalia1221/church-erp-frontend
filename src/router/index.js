@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardLayout from '@/components/layout/DashboardLayout.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   {
@@ -93,6 +94,34 @@ const routes = [
         redirect: '/absensi/check-in-acara'
       },
       {
+        path: 'keuangan/kategori',
+        name: 'FinanceCategory',
+        component: () => import('@/views/finance/FinanceCategoryView.vue')
+      },
+      {
+        path: 'keuangan/persembahan',
+        name: 'Persembahan',
+        component: () => import('@/views/finance/PersembahanView.vue')
+      },
+      {
+        path: 'persembahan',
+        redirect: '/keuangan/persembahan'
+      },
+      {
+        path: 'keuangan/lainnya',
+        name: 'KasLainnya',
+        component: () => import('@/views/finance/KasLainnyaView.vue')
+      },
+      {
+        path: 'keuangan/laporan',
+        name: 'FinancialReport',
+        component: () => import('@/views/finance/FinancialReportView.vue')
+      },
+      {
+        path: 'laporan-keuangan',
+        redirect: '/keuangan/laporan'
+      },
+      {
         path: 'settings',
         name: 'Settings',
         component: () => import('@/views/settings/SettingListView.vue')
@@ -110,7 +139,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token')
 
   if (to.meta.requiresAuth && !token) {
@@ -119,6 +148,26 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.guestOnly && token) {
     return next({ name: 'Dashboard' })
+  }
+
+  // Verifikasi izin akses menu (can_read) untuk halaman terproteksi
+  if (to.meta.requiresAuth && token) {
+    const authStore = useAuthStore()
+
+    // Muat menu jika belum ada di state
+    if ((!authStore.myMenus || authStore.myMenus.length === 0) && !authStore.loadingMenus) {
+      await authStore.fetchMyMenus()
+    }
+
+    const cleanPath = (to.path || '').split('?')[0].replace(/\/+$/, '') || '/'
+    // Abaikan rute dashboard atau root
+    if (cleanPath !== '/dashboard' && cleanPath !== '') {
+      const perms = authStore.getPermissionsByPath(cleanPath)
+      if (perms && perms.can_read === false) {
+        console.warn(`[AuthGuard] Akses ditolak ke path: ${cleanPath}. can_read = false`)
+        return next({ name: 'Dashboard' })
+      }
+    }
   }
 
   next()

@@ -8,6 +8,7 @@
       </div>
 
       <button
+        v-if="canCreate"
         @click="openAddModal"
         class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
       >
@@ -132,10 +133,11 @@
                 </div>
               </td>
 
-              <!-- Aksi (Detail & Hapus) -->
+              <!-- Aksi (Detail, Edit & Hapus) -->
               <td class="py-3.5 px-4 text-center">
                 <div class="flex items-center justify-center gap-2">
                   <button
+                    v-if="canShow"
                     @click="openDetailModal(item)"
                     class="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
                     title="Lihat Daftar GSM yang Berhadir"
@@ -144,6 +146,16 @@
                     <span>Detail</span>
                   </button>
                   <button
+                    v-if="canUpdate"
+                    @click="openEditModal(item)"
+                    class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                    title="Edit Acara Lainnya"
+                  >
+                    <span>✏️</span>
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    v-if="canDelete"
                     @click="handleDelete(item)"
                     class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                     title="Hapus Acara"
@@ -159,11 +171,12 @@
     </div>
 
     <!-- ==================== MODAL TAMBAH ACARA LAINNYA ==================== -->
-    <div
-      v-if="isAddModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto"
-    >
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-md shadow-2xl space-y-5 my-auto">
+    <Teleport to="body">
+      <div
+        v-if="isAddModalOpen"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto"
+      >
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-md shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] space-y-5 my-auto">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
             <h3 class="text-base font-bold text-slate-900">Tambah Acara Lainnya</h3>
@@ -217,6 +230,24 @@
             </p>
           </div>
 
+          <!-- 4. Checkbox ADA PERSEMBAHAN -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                v-model="form.is_persembahan"
+                type="checkbox"
+                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer w-4 h-4"
+              />
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                <span>💰</span>
+                <span>Ada Persembahan</span>
+              </span>
+            </label>
+            <p class="text-[11px] text-slate-500 leading-relaxed pl-6">
+              Jika dicentang, acara ini akan masuk ke halaman <strong>Persembahan</strong> untuk pencatatan kas keuangan.
+            </p>
+          </div>
+
           <!-- Actions -->
           <div class="pt-3 flex items-center justify-end gap-3 border-t border-slate-100">
             <button
@@ -237,13 +268,115 @@
         </form>
       </div>
     </div>
+  </Teleport>
+
+    <!-- ==================== MODAL EDIT ACARA LAINNYA ==================== -->
+    <Teleport to="body">
+      <div
+        v-if="isEditModalOpen"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto"
+      >
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-md shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] space-y-5 my-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Edit Acara Lainnya</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Ubah nama acara, tanggal, absensi, atau status persembahan</p>
+          </div>
+          <button @click="isEditModalOpen = false" class="text-slate-400 hover:text-slate-600 cursor-pointer text-lg">✕</button>
+        </div>
+
+        <form @submit.prevent="submitUpdateLainnya" class="space-y-4">
+          <!-- 1. Input Nama Acara (Title) -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              Nama Acara <span class="text-rose-500">*</span>
+            </label>
+            <input
+              v-model="editForm.title"
+              type="text"
+              required
+              placeholder="Contoh: Retreat GSM, Latihan Pujian, dll."
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-indigo-600"
+            />
+          </div>
+
+          <!-- 2. Input Tanggal Acara -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              Tanggal Acara <span class="text-rose-500">*</span>
+            </label>
+            <input
+              v-model="editForm.event_date"
+              type="date"
+              required
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:outline-none focus:border-indigo-600 cursor-pointer"
+            />
+          </div>
+
+          <!-- 3. Checkbox MELAKUKAN ABSENSI -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                v-model="editForm.is_attendance"
+                type="checkbox"
+                class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer w-4 h-4"
+              />
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">
+                Melakukan Absensi
+              </span>
+            </label>
+            <p class="text-[11px] text-slate-500 leading-relaxed pl-6">
+              Status pendaftaran kehadiran Guru Sekolah Minggu (GSM) untuk acara ini.
+            </p>
+          </div>
+
+          <!-- 4. Checkbox ADA PERSEMBAHAN -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input
+                v-model="editForm.is_persembahan"
+                type="checkbox"
+                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer w-4 h-4"
+              />
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                <span>💰</span>
+                <span>Ada Persembahan</span>
+              </span>
+            </label>
+            <p class="text-[11px] text-slate-500 leading-relaxed pl-6">
+              Jika dicentang, acara ini akan masuk ke halaman <strong>Persembahan</strong> untuk pencatatan kas keuangan.
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div class="pt-3 flex items-center justify-end gap-3 border-t border-slate-100">
+            <button
+              type="button"
+              @click="isEditModalOpen = false"
+              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              :disabled="submitting || !editForm.title.trim() || !editForm.event_date"
+              class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-all shadow-sm disabled:opacity-50 cursor-pointer"
+            >
+              {{ submitting ? 'Menyimpan...' : 'Perbarui Acara' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </Teleport>
 
     <!-- ==================== MODAL DETAIL KEHADIRAN GSM ==================== -->
-    <div
-      v-if="isDetailModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs overflow-y-auto"
-    >
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-2xl shadow-2xl space-y-5 my-auto max-h-[90vh] flex flex-col">
+    <Teleport to="body">
+      <div
+        v-if="isDetailModalOpen"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-y-auto"
+      >
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 w-full max-w-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] space-y-5 my-auto max-h-[90vh] flex flex-col">
         <!-- Header -->
         <div class="flex items-start justify-between pb-3 border-b border-slate-100 shrink-0">
           <div>
@@ -343,12 +476,16 @@
         </div>
       </div>
     </div>
+  </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import apiClient from '@/api/axios'
+import { usePermissions } from '@/composables/usePermissions'
+
+const { canRead, canCreate, canShow, canUpdate, canDelete, canPrint } = usePermissions()
 
 const lainnyaEvents = ref([])
 const loading = ref(false)
@@ -356,6 +493,7 @@ const submitting = ref(false)
 const searchQuery = ref('')
 
 const isAddModalOpen = ref(false)
+const isEditModalOpen = ref(false)
 const isDetailModalOpen = ref(false)
 const currentLainnya = ref(null)
 
@@ -372,7 +510,16 @@ const alert = reactive({
 const form = reactive({
   title: '',
   event_date: '',
-  is_attendance: false // Secara default TIDAK tercentang
+  is_attendance: false, // Secara default TIDAK tercentang
+  is_persembahan: false // Default tidak tercentang
+})
+
+const editForm = reactive({
+  id: null,
+  title: '',
+  event_date: '',
+  is_attendance: false,
+  is_persembahan: false
 })
 
 // Format tanggal lokal (Contoh: 14 September 2026)
@@ -424,6 +571,7 @@ const openAddModal = () => {
   form.title = ''
   form.event_date = today
   form.is_attendance = false // Default tidak tercentang
+  form.is_persembahan = false // Default tidak tercentang
   isAddModalOpen.value = true
 }
 
@@ -447,7 +595,8 @@ const submitCreateLainnya = async () => {
     const payload = {
       title: form.title.trim(),
       event_date: form.event_date,
-      is_attendance: Boolean(form.is_attendance)
+      is_attendance: Boolean(form.is_attendance),
+      is_persembahan: Boolean(form.is_persembahan)
     }
 
     const res = await apiClient.post('/lainnya', payload)
@@ -462,6 +611,55 @@ const submitCreateLainnya = async () => {
   } catch (error) {
     alert.type = 'error'
     alert.message = error.message || 'Gagal membuat acara lainnya'
+  } finally {
+    submitting.value = false
+  }
+}
+
+// Buka Modal Edit
+const openEditModal = (item) => {
+  editForm.id = item.id
+  editForm.title = item.title || ''
+  editForm.event_date = item.event_date ? item.event_date.substring(0, 10) : ''
+  editForm.is_attendance = Boolean(item.is_attendance)
+  editForm.is_persembahan = Boolean(item.is_persembahan)
+  isEditModalOpen.value = true
+}
+
+// Submit Update Acara Lainnya
+const submitUpdateLainnya = async () => {
+  if (!editForm.title.trim()) {
+    alert.type = 'error'
+    alert.message = 'Nama acara wajib diisi'
+    return
+  }
+
+  if (!editForm.event_date) {
+    alert.type = 'error'
+    alert.message = 'Tanggal acara wajib dipilih'
+    return
+  }
+
+  submitting.value = true
+  alert.message = ''
+  try {
+    const payload = {
+      title: editForm.title.trim(),
+      event_date: editForm.event_date,
+      is_attendance: Boolean(editForm.is_attendance),
+      is_persembahan: Boolean(editForm.is_persembahan)
+    }
+
+    const res = await apiClient.put(`/lainnya/${editForm.id}`, payload)
+    if (res.success) {
+      alert.type = 'success'
+      alert.message = `Acara "${res.data?.title || editForm.title}" berhasil diperbarui!`
+      isEditModalOpen.value = false
+      await fetchLainnya()
+    }
+  } catch (error) {
+    alert.type = 'error'
+    alert.message = error.message || 'Gagal memperbarui acara lainnya'
   } finally {
     submitting.value = false
   }
